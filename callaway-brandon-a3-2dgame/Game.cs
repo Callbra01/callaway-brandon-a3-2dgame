@@ -3,72 +3,68 @@ using System;
 using System.Numerics;
 
 // The namespace your code is in.
-namespace Game10003
+namespace Game10003;
+
+/// <summary>
+///     Your game code goes inside this class!
+/// </summary>
+public class Game
 {
+    // Place your variables here:
+    int windowWidth = 800;
+    int windowHeight = 600;
+    int tileSize = 50;
+    int tileRowCount;
+    int tileColCount;
+    Tile[] tileArray;
+    Vector2[] tilePositions;
+
+
     /// <summary>
-    ///     Your game code goes inside this class!
+    ///     Setup runs once before the game loop begins.
     /// </summary>
-    public class Game
+    public void Setup()
     {
-        // Place your variables here:
-        int windowWidth = 800;
-        int windowHeight = 600;
-        int tileSize = 50;
-        int tileRowCount;
-        int tileColCount;
-        Tile[] tileArray;
+        Window.SetTitle("bGame");
+        Window.SetSize(windowWidth, windowHeight);
 
+        // Populate tile array with a given amount of tiles
+        tileRowCount = windowHeight / tileSize;
+        tileColCount = windowWidth / tileSize;
+        tileArray = new Tile[tileRowCount * tileColCount];
+        tilePositions = new Vector2[tileRowCount * tileColCount];
 
-        /// <summary>
-        ///     Setup runs once before the game loop begins.
-        /// </summary>
-        public void Setup()
+        // index starts at 0, loop through rows and columns to get new position via tile size. 
+        int tilePositionIndex = 0;
+        for (int row = 0; row < tileRowCount; row++)
         {
-            Window.SetSize(windowWidth, windowHeight);
-            tileRowCount = windowHeight / tileSize;
-            tileColCount = windowWidth / tileSize;
-
-
-            tileArray = new Tile[tileRowCount * tileColCount];
-
-
-
-           // 
-            
-
+            for (int col = 0; col < tileColCount; col++)
+            {
+                Vector2 newPosition = new Vector2(col * tileSize, row * tileSize);
+                tilePositions[tilePositionIndex] = newPosition;
+                tilePositionIndex++;
+            }
         }
 
-        /// <summary>
-        ///     Update runs every frame.
-        /// </summary>
-        public void Update()
+        for (int tile = 0; tile < tileArray.Length; tile++)
         {
-            Window.ClearBackground(Color.Black);
-            /*
-            for (int i = 0; i < tileArray.Length; i++)
-            {
-                tileArray[i].Render();
-                
-            }
-            */
+            tileArray[tile] = new Tile();
+            tileArray[tile].position = tilePositions[tile];
+        }
 
-            // Loop through every index in the tile array
-            for (int i = 0; i < tileArray.Length; i++)
-            {
-                // for every row
-                for (int row = 0; row < tileRowCount; row++)
-                {
-                    // for every column
-                    for (int col = 0; col < tileColCount; col++)
-                    {
-                        //Populate a given index 
-                        //tileArray[i] = new Tile(col * tileSize, row * tileSize, tileSize);
-                        Draw.FillColor = Color.White;
-                        Draw.Square(col * tileSize, row * tileSize, tileSize);
-                    }
-                }
-            }
+        tileArray[16*12 -1].UpdateColor(Color.Clear);
+    }
 
+    /// <summary>
+    ///     Update runs every frame.
+    /// </summary>
+    public void Update()
+    {
+        Window.ClearBackground(Color.Black);
+        
+        for (int i = 0; i < tileArray.Length; i++)
+        {
+            tileArray[i].Render();
         }
     }
 }

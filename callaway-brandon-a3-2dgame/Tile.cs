@@ -6,28 +6,37 @@ namespace Game10003;
 
 public class Tile
 {
-    public int x;
-    public int y;
+    public Vector2 position;
     int size;
-
+    Color color;
     int collisionTag;
     
-    public Tile(int xCoord, int yCoord, int tileSize)
+    public Tile()
     {
-        x = xCoord;
-        y = yCoord;
-        size = tileSize;
-
+        position = new Vector2(0, 0);
+        color = Color.White;
+        size = 50;
+    }
+   
+    public void SetupPosition(Vector2 newPosition)
+    {
+        position = newPosition;
     }
 
-    void Setup()
+    public void UpdatePosition(Vector2 newPosition, int newSize)
     {
-        
+        position = newPosition;
+        size = newSize;
+    }
+
+    public void UpdateColor(Color newColor)
+    {
+        color = newColor;
     }
 
     public void Render()
     {
-        Draw.FillColor = Color.White;
-        Draw.Square(x, y, size);
+        Draw.FillColor = color;
+        Draw.Square(position, size);
     }
 }
