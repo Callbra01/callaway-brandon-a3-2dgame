@@ -10,6 +10,8 @@ public class Tile
     int size;
     Color color;
     int collisionTag;
+
+    int colorIndex = -1;
     
     public Tile()
     {
@@ -29,6 +31,36 @@ public class Tile
         size = newSize;
     }
 
+    public void UpdateColorIndex()
+    {
+        colorIndex += 1;
+
+        if (colorIndex == -1)
+        {
+            color = Color.OffWhite;
+        }
+        else if (colorIndex == 0)
+        {
+            color = Color.Blue;
+        }
+        else if (colorIndex == 1)
+        {
+            color = Color.Red;
+        }
+        else if (colorIndex == 2)
+        {
+            color = Color.Yellow;
+        }
+        else if (colorIndex == 3)
+        {
+            color = Color.Green;
+        }
+        else if (colorIndex > 3)
+        {
+            color = Color.OffWhite;
+            colorIndex = -1;
+        }
+    }
     public void UpdateColor(Color newColor)
     {
         color = newColor;

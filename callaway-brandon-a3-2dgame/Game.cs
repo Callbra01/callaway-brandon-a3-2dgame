@@ -27,6 +27,8 @@ public class Game
     {
         Window.SetTitle("bGame");
         Window.SetSize(windowWidth, windowHeight);
+        Window.TargetFPS = 60;
+        
 
         // Populate tile array with a given amount of tiles
         tileRowCount = windowHeight / tileSize;
@@ -46,13 +48,12 @@ public class Game
             }
         }
 
+        // For every tile, update position
         for (int tile = 0; tile < tileArray.Length; tile++)
         {
             tileArray[tile] = new Tile();
             tileArray[tile].position = tilePositions[tile];
         }
-
-        tileArray[16*12 -1].UpdateColor(Color.Clear);
     }
 
     /// <summary>
@@ -65,6 +66,50 @@ public class Game
         for (int i = 0; i < tileArray.Length; i++)
         {
             tileArray[i].Render();
+        }
+        
+        CollisionCheck();
+        DEBUGINPUT();
+    }
+
+    void DEBUGINPUT()
+    {
+        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
+        {
+            for (int tile = 0; tile < tileArray.Length; tile++)
+            {
+                tileArray[tile].position.X -= 50 * Time.DeltaTime;
+            }
+        }
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
+        {
+            for (int tile = 0; tile < tileArray.Length; tile++)
+            {
+                tileArray[tile].position.X += 50 * Time.DeltaTime;
+            }
+        }
+    }
+
+    // If user clicks within the boundaries of a given tile, cycle colors
+    void CollisionCheck()
+    {
+        
+        for (int tile = 0; tile < tileArray.Length; tile++)
+        {   
+            // Mouse/Tile collision check
+            if (Input.GetMousePosition().X >= tileArray[tile].position.X + 2 && Input.GetMousePosition().X <= tileArray[tile].position.X + tileSize - 2)
+            {
+                if (Input.GetMousePosition().Y >= tileArray[tile].position.Y + 2 && Input.GetMousePosition().Y <= tileArray[tile].position.Y + tileSize - 2)
+                {
+                    if (Input.IsMouseButtonPressed(MouseInput.Left))
+                    {
+                        tileArray[tile].UpdateColorIndex();
+                    }
+                }
+            }
+
+            // Player Collision check with Tile tags
+
         }
     }
 }
