@@ -13,6 +13,8 @@ public class LevelEditor
     bool mouseIntersectsX = false;
     bool mouseIntersectsY = false;
 
+    int[] tileColorIndexVals;
+    LevelHandler levelHandler;
 
     public void Setup()
     {
@@ -21,6 +23,8 @@ public class LevelEditor
         tileColCount = Game.windowWidth / tileSize;
         tileArray = new Tile[tileRowCount * tileColCount];
         tilePositions = new Vector2[tileRowCount * tileColCount];
+
+        levelHandler = new LevelHandler();
 
         // index starts at 0, loop through rows and columns to get new position via tile size. 
         int tilePositionIndex = 0;
@@ -44,13 +48,39 @@ public class LevelEditor
 
     public void Update()
     {
+        Render();
+        MouseCollisionCheck();
+        HandleInput();
+    }
+
+    // Draw all tiles
+    void Render()
+    {
         // Render all tiles in tile array
         for (int i = 0; i < tileArray.Length; i++)
         {
             tileArray[i].Render();
         }
+    }
 
-        MouseCollisionCheck();
+    // Save or Load depending on input
+    void HandleInput()
+    {
+        if(Input.IsKeyboardKeyPressed(KeyboardInput.Q))
+        {
+            levelHandler.SaveLevel("../../../assets/levels/levelEditor0.txt", tileArray);
+        }
+        else if (Input.IsKeyboardKeyPressed(KeyboardInput.E))
+        {
+            tileColorIndexVals = new int[tileArray.Length];
+
+            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelEditor0.txt", tileColorIndexVals);
+
+            for (int i = 0; i < tileArray.Length; i++)
+            {
+                tileArray[i].UpdateColorIndex(tileColorIndexVals[i]);
+            }
+        }
     }
 
     void MouseCollisionCheck()
@@ -58,16 +88,15 @@ public class LevelEditor
         for (int tile = 0; tile < tileArray.Length; tile++)
         {
             int currentColorIndex = tileArray[tile].colorIndex;
-            // int newColorIndex = tileArray[tile].UpdateColorIndex();
+            int newColorIndex = currentColorIndex + 1;
 
             // Left alt wipes the screen
             if (Input.IsKeyboardKeyDown(KeyboardInput.LeftAlt))
             {
                 tileArray[tile].UpdateColorIndex(-1);
-               
             }
 
-            // Set collision check bool true if 
+            // Keep track to tiles that intersect mouseX and mouseY
             if (Input.GetMousePosition().X >= tileArray[tile].position.X + 2 && Input.GetMousePosition().X <= tileArray[tile].position.X + tileSize - 2)
             {
                 mouseIntersectsX = true;
@@ -86,19 +115,19 @@ public class LevelEditor
                 mouseIntersectsY = false;
             }
 
-            // Mouse/Tile collision check
-
-
+            // If control is down, left click for columns, right click for rows
             if (Input.IsKeyboardKeyDown(KeyboardInput.LeftControl))
             {
-
+                // Create rows
                 if (mouseIntersectsY)
                 {
                     if (Input.IsMouseButtonPressed(MouseInput.Right))
-                    {
+                    { 
                         tileArray[tile].UpdateColorIndex();
                     }
                 }
+
+                // Create collumns
                 else if (mouseIntersectsX)
                 {
                     if (Input.IsMouseButtonPressed(MouseInput.Left))
@@ -108,8 +137,7 @@ public class LevelEditor
                 }
             }
 
-
-
+            // If mouse is clicked over a tile, change color
             if (mouseIntersectsX && mouseIntersectsY)
             {
                 if (Input.IsMouseButtonPressed(MouseInput.Left))

@@ -36,16 +36,17 @@ public class Tile
     public void ResetColorIndices()
     {
         this.colorIndex = -1;
-        Console.WriteLine($"{this.colorIndex}");
     }
 
-    public void UpdateColorIndex(int optionalColorIndex = -2) //int UpdateColorIndex(int optionalColorIndex = -2)
+    public void UpdateColorIndex(int optionalColorIndex = -2)
     {
-        colorIndex += 1;
-
         if (optionalColorIndex != -2)
         {
-            colorIndex = -1;
+            colorIndex = optionalColorIndex;
+        }
+        else
+        {
+            colorIndex += 1;
         }
 
         if (colorIndex == -1 || optionalColorIndex == -1)
@@ -78,14 +79,14 @@ public class Tile
             color = Color.OffWhite;
             colorIndex = -1;
         }
-
-        return colorIndex;
     }
 
+    // TODO SETUP COLLISION CHECK
     public void CollisionCheck(Tile tile)
     {
 
     }
+
     public void UpdateColor(Color newColor)
     {
         color = newColor;

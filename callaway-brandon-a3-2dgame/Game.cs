@@ -13,6 +13,7 @@ public class Game
     // Place your variables here:
     public static int windowWidth = 800;
     public static int windowHeight = 600;
+    
 
     Player player;
     LevelEditor Editor;
@@ -23,21 +24,24 @@ public class Game
     /// </summary>
     public void Setup()
     {
-        Window.SetTitle("bGame");
-        Window.SetSize(windowWidth, windowHeight);
-        Window.TargetFPS = 60;
+        WindowInitialization();
+
 
         //player = new Player();
 
+        
         // Setup Editor
         Editor = new LevelEditor();
         Editor.Setup();
-
     }
 
-    /// <summary>
-    ///     Update runs every frame.
-    /// </summary>
+    void WindowInitialization()
+    {
+        Window.SetTitle("bGame");
+        Window.SetSize(windowWidth, windowHeight);
+        Window.TargetFPS = 60;
+    }
+
     public void Update()
     {
         Window.ClearBackground(Color.Black);
