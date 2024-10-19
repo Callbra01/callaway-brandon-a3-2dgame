@@ -13,11 +13,13 @@ public class Game
     // Place your variables here:
     int windowWidth = 800;
     int windowHeight = 600;
+
     int tileSize = 50;
     int tileRowCount;
     int tileColCount;
     Tile[] tileArray;
     Vector2[] tilePositions;
+    Player player;
 
 
     /// <summary>
@@ -28,7 +30,8 @@ public class Game
         Window.SetTitle("bGame");
         Window.SetSize(windowWidth, windowHeight);
         Window.TargetFPS = 60;
-        
+
+        //player = new Player();
 
         // Populate tile array with a given amount of tiles
         tileRowCount = windowHeight / tileSize;
@@ -63,17 +66,21 @@ public class Game
     {
         Window.ClearBackground(Color.Black);
         
+        // Render all tiles in tile array
         for (int i = 0; i < tileArray.Length; i++)
         {
             tileArray[i].Render();
         }
         
+
+        //player.Handle();
+
         CollisionCheck();
-        DEBUGINPUT();
     }
 
     void DEBUGINPUT()
     {
+        /*
         if (Input.IsKeyboardKeyDown(KeyboardInput.A))
         {
             for (int tile = 0; tile < tileArray.Length; tile++)
@@ -88,6 +95,7 @@ public class Game
                 tileArray[tile].position.X += 50 * Time.DeltaTime;
             }
         }
+        */
     }
 
     // If user clicks within the boundaries of a given tile, cycle colors
@@ -109,7 +117,10 @@ public class Game
             }
 
             // Player Collision check with Tile tags
-
+            if (tileArray[tile].canCollide)
+            {
+                //player.HandleCollision(tileArray[tile]);
+            }
         }
     }
 }

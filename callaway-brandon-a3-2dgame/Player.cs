@@ -1,34 +1,67 @@
 ﻿using System;
+using System.Drawing;
 using System.Numerics;
 
 namespace Game10003;
 
 public class Player
 {
-    public Vector2 position;
-    Vector2 velocity;
-    int playerSize;
+    public Vector2 position = new Vector2(350, 250);
+    Vector2 velocity = new Vector2(0, 0);
+    int playerSize = 50;
+    int playerSpeed = 50;
+    int gravityForce = 10;
 
 
-    public Player()
+    public void Handle()
     {
-        int playerSize = 50;
-        Vector2 position = new Vector2(350, 250);
-        Vector2 vector2 = new Vector2();
+        HandleInput();
+        Render();
     }
 
-    public void Update()
+    void HandleInput()
     {
+        
+        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
+        {
+            velocity.X -= playerSpeed;
+        }
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
+        {
+            velocity.X += playerSpeed;
+        }
 
+        if (Input.IsKeyboardKeyPressed(KeyboardInput.Space))
+        {
+            velocity.Y -= playerSpeed;
+        }
+        //velocity.Y += gravityForce * Time.DeltaTime * 100;
+        position += velocity * Time.DeltaTime;
     }
 
-    public void HandleInput()
+    public void HandleCollision(Tile tile)
     {
-
+        if (tile.position.X >= position.X && tile.position.X <= position.X + playerSize && tile.position.Y >= position.Y && tile.position.Y <= position.Y + playerSize)
+        {
+            velocity = -velocity;
+        }
+        else if (tile.position.X >= position.X && tile.position.X <= position.X + playerSize && tile.position.Y + tile.size >= position.Y && tile.position.Y + tile.size <= position.Y + playerSize)
+        {
+            velocity = -velocity;
+        }
+        else if (tile.position.X + tile.size >= position.X && tile.position.X + tile.size <= position.X + playerSize && tile.position.Y >= position.Y && tile.position.Y <= position.Y + playerSize)
+        {
+            velocity = -velocity;
+        }
+        else if (tile.position.X + tile.size >= position.X && tile.position.X + tile.size <= position.X + playerSize && tile.position.Y + tile.size >= position.Y && tile.position.Y + tile.size <= position.Y + playerSize)
+        {
+            velocity = -velocity;
+        }
     }
 
-    public void Render()
+    void Render()
     {
-
+        Draw.FillColor = Color.Black;
+        Draw.Square(position, playerSize);
     }
 }

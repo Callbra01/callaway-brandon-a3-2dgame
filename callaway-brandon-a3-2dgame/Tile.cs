@@ -7,11 +7,11 @@ namespace Game10003;
 public class Tile
 {
     public Vector2 position;
-    int size;
+    public int size;
     Color color;
-    int collisionTag;
+    public bool canCollide;
 
-    int colorIndex = -1;
+    public int colorIndex = -1;
     
     public Tile()
     {
@@ -38,28 +38,38 @@ public class Tile
         if (colorIndex == -1)
         {
             color = Color.OffWhite;
+            canCollide = false;
         }
         else if (colorIndex == 0)
         {
             color = Color.Blue;
+            canCollide = true;
         }
         else if (colorIndex == 1)
         {
             color = Color.Red;
+            canCollide = false;
         }
         else if (colorIndex == 2)
         {
             color = Color.Yellow;
+            canCollide = false;
         }
         else if (colorIndex == 3)
         {
             color = Color.Green;
+            canCollide = false;
         }
         else if (colorIndex > 3)
         {
             color = Color.OffWhite;
             colorIndex = -1;
         }
+    }
+
+    public void CollisionCheck(Tile tile)
+    {
+
     }
     public void UpdateColor(Color newColor)
     {
