@@ -11,15 +11,11 @@ namespace Game10003;
 public class Game
 {
     // Place your variables here:
-    int windowWidth = 800;
-    int windowHeight = 600;
+    public static int windowWidth = 800;
+    public static int windowHeight = 600;
 
-    int tileSize = 50;
-    int tileRowCount;
-    int tileColCount;
-    Tile[] tileArray;
-    Vector2[] tilePositions;
     Player player;
+    LevelEditor Editor;
 
 
     /// <summary>
@@ -33,30 +29,10 @@ public class Game
 
         //player = new Player();
 
-        // Populate tile array with a given amount of tiles
-        tileRowCount = windowHeight / tileSize;
-        tileColCount = windowWidth / tileSize;
-        tileArray = new Tile[tileRowCount * tileColCount];
-        tilePositions = new Vector2[tileRowCount * tileColCount];
+        // Setup Editor
+        Editor = new LevelEditor();
+        Editor.Setup();
 
-        // index starts at 0, loop through rows and columns to get new position via tile size. 
-        int tilePositionIndex = 0;
-        for (int row = 0; row < tileRowCount; row++)
-        {
-            for (int col = 0; col < tileColCount; col++)
-            {
-                Vector2 newPosition = new Vector2(col * tileSize, row * tileSize);
-                tilePositions[tilePositionIndex] = newPosition;
-                tilePositionIndex++;
-            }
-        }
-
-        // For every tile, update position
-        for (int tile = 0; tile < tileArray.Length; tile++)
-        {
-            tileArray[tile] = new Tile();
-            tileArray[tile].position = tilePositions[tile];
-        }
     }
 
     /// <summary>
@@ -65,17 +41,10 @@ public class Game
     public void Update()
     {
         Window.ClearBackground(Color.Black);
-        
-        // Render all tiles in tile array
-        for (int i = 0; i < tileArray.Length; i++)
-        {
-            tileArray[i].Render();
-        }
-        
 
         //player.Handle();
 
-        CollisionCheck();
+        Editor.Update();
     }
 
     void DEBUGINPUT()
@@ -98,29 +67,4 @@ public class Game
         */
     }
 
-    // If user clicks within the boundaries of a given tile, cycle colors
-    void CollisionCheck()
-    {
-        
-        for (int tile = 0; tile < tileArray.Length; tile++)
-        {   
-            // Mouse/Tile collision check
-            if (Input.GetMousePosition().X >= tileArray[tile].position.X + 2 && Input.GetMousePosition().X <= tileArray[tile].position.X + tileSize - 2)
-            {
-                if (Input.GetMousePosition().Y >= tileArray[tile].position.Y + 2 && Input.GetMousePosition().Y <= tileArray[tile].position.Y + tileSize - 2)
-                {
-                    if (Input.IsMouseButtonPressed(MouseInput.Left))
-                    {
-                        tileArray[tile].UpdateColorIndex();
-                    }
-                }
-            }
-
-            // Player Collision check with Tile tags
-            if (tileArray[tile].canCollide)
-            {
-                //player.HandleCollision(tileArray[tile]);
-            }
-        }
-    }
 }
