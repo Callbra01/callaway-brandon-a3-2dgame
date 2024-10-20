@@ -16,13 +16,13 @@ public class LevelHandler
 
         int[] tempIntArray = new int[tempStringArray.Length];
 
-        for (int colorIndex = 0; colorIndex < tempIntArray.Length; colorIndex++)
+        for (int spriteIndex = 0; spriteIndex < tempIntArray.Length; spriteIndex++)
         {
             int currentValue;
-            string currentChar = tempStringArray[colorIndex];
+            string currentChar = tempStringArray[spriteIndex];
             if (int.TryParse(currentChar, out currentValue))
             {
-                tempIntArray[colorIndex] = currentValue;
+                tempIntArray[spriteIndex] = currentValue;
             }
         }
         streamReader.Close();
@@ -30,14 +30,14 @@ public class LevelHandler
         return tempIntArray;
     }
 
-    // 
     public void SaveLevel(string levelFilePath, Tile[] tileArrayVar)
     {
+        // Write int array to string
         StreamWriter streamWriter = new StreamWriter(levelFilePath);
         
         for (int tile = 0; tile < tileArrayVar.Length; tile++)
         {
-            streamWriter.Write($"{tileArrayVar[tile].colorIndex}{'_'}");
+            streamWriter.Write($"{tileArrayVar[tile].spriteIndex}{'_'}");
         }
         streamWriter.Close();
     }

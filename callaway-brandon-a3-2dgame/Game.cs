@@ -13,10 +13,13 @@ public class Game
     // Place your variables here:
     public static int windowWidth = 800;
     public static int windowHeight = 600;
-    
+
+    public static Texture2D caveTexture;
+    static Texture2D backgroundTexture;
 
     Player player;
     LevelEditor Editor;
+    
 
 
     /// <summary>
@@ -24,51 +27,34 @@ public class Game
     /// </summary>
     public void Setup()
     {
-        WindowInitialization();
+        InitializeWindow();
+        InitializeTextures();
 
+        player = new Player();
 
-        //player = new Player();
-
-        
         // Setup Editor
         Editor = new LevelEditor();
         Editor.Setup();
     }
 
-    void WindowInitialization()
+    void InitializeWindow()
     {
         Window.SetTitle("bGame");
         Window.SetSize(windowWidth, windowHeight);
         Window.TargetFPS = 60;
     }
 
+    void InitializeTextures()
+    {
+        caveTexture = Graphics.LoadTexture("../../../assets/textures/caveTexture.png");
+        backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture.png");
+    }
     public void Update()
     {
         Window.ClearBackground(Color.Black);
-
-        //player.Handle();
+        Graphics.Draw(backgroundTexture, 0, 0);
+        player.Handle();
 
         Editor.Update();
     }
-
-    void DEBUGINPUT()
-    {
-        /*
-        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
-        {
-            for (int tile = 0; tile < tileArray.Length; tile++)
-            {
-                tileArray[tile].position.X -= 50 * Time.DeltaTime;
-            }
-        }
-        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
-        {
-            for (int tile = 0; tile < tileArray.Length; tile++)
-            {
-                tileArray[tile].position.X += 50 * Time.DeltaTime;
-            }
-        }
-        */
-    }
-
 }

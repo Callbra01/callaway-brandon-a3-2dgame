@@ -8,6 +8,8 @@ public class LevelEditor
     public int tileSize = 50;
     public int tileRowCount;
     public int tileColCount;
+    int levelSize = 3;
+
     public Tile[] tileArray;
     public Vector2[] tilePositions;
     bool mouseIntersectsX = false;
@@ -20,9 +22,9 @@ public class LevelEditor
     {
         // Populate tile array with a given amount of tiles
         tileRowCount = Game.windowHeight / tileSize;
-        tileColCount = Game.windowWidth / tileSize;
+        tileColCount = (Game.windowWidth / tileSize) * levelSize;
         tileArray = new Tile[tileRowCount * tileColCount];
-        tilePositions = new Vector2[tileRowCount * tileColCount];
+        tilePositions = new Vector2[tileArray.Length];
 
         levelHandler = new LevelHandler();
 
@@ -43,6 +45,7 @@ public class LevelEditor
         {
             tileArray[tile] = new Tile();
             tileArray[tile].position = tilePositions[tile];
+            
         }
     }
 
@@ -81,14 +84,31 @@ public class LevelEditor
                 tileArray[i].UpdateColorIndex(tileColorIndexVals[i]);
             }
         }
+
+        /* DEBUG INPUT
+        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
+        {
+            for (int tile = 0; tile < tileArray.Length; tile++)
+            {
+                tileArray[tile].position.X -= 1000 * Time.DeltaTime;
+            }
+        }
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
+        {
+            for (int tile = 0; tile < tileArray.Length; tile++)
+            {
+                tileArray[tile].position.X += 1000 * Time.DeltaTime;
+            }
+        }
+        */
+
     }
 
     void MouseCollisionCheck()
     {
         for (int tile = 0; tile < tileArray.Length; tile++)
         {
-            int currentColorIndex = tileArray[tile].colorIndex;
-            int newColorIndex = currentColorIndex + 1;
+            int currentColorIndex = tileArray[tile].spriteIndex;
 
             // Left alt wipes the screen
             if (Input.IsKeyboardKeyDown(KeyboardInput.LeftAlt))

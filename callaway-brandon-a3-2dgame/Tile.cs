@@ -9,22 +9,23 @@ public class Tile
     public Vector2 position;
     public int size;
     Color color;
+    Texture2D sprite;
     public bool canCollide;
 
-    public int colorIndex = -1;
-    //public int nextColorIndex = 0;
+    public int spriteIndex = -1;
+    //public int nextspriteIndex = 0;
+
     
     public Tile()
     {
         position = new Vector2(0, 0);
-        color = Color.White;
+        color = Color.Clear;
         size = 50;
     }
    
     public void SetupPosition(Vector2 newPosition)
     {
         position = newPosition;
-        //nextColorIndex = colorIndex + 1;
     }
 
     public void UpdatePosition(Vector2 newPosition, int newSize)
@@ -35,49 +36,51 @@ public class Tile
 
     public void ResetColorIndices()
     {
-        this.colorIndex = -1;
+        this.spriteIndex = -1;
     }
 
-    public void UpdateColorIndex(int optionalColorIndex = -2)
+    public void UpdateColorIndex(int optionalspriteIndex = -2)
     {
-        if (optionalColorIndex != -2)
+        if (optionalspriteIndex != -2)
         {
-            colorIndex = optionalColorIndex;
+            spriteIndex = optionalspriteIndex;
         }
         else
         {
-            colorIndex += 1;
+            spriteIndex += 1;
         }
 
-        if (colorIndex == -1 || optionalColorIndex == -1)
+        if (spriteIndex == -1 || optionalspriteIndex == -1)
         {
-            color = Color.OffWhite;
+            color = Color.Clear;
             canCollide = false;
         }
-        else if (colorIndex == 0 || optionalColorIndex == 0)
+        else if (spriteIndex == 0 || optionalspriteIndex == 0)
         {
             color = Color.Blue;
+            sprite = Game.caveTexture;
+
             canCollide = true;
         }
-        else if (colorIndex == 1 || optionalColorIndex == 1)
+        else if (spriteIndex == 1 || optionalspriteIndex == 1)
         {
             color = Color.Red;
             canCollide = false;
         }
-        else if (colorIndex == 2 || optionalColorIndex == 2)
+        else if (spriteIndex == 2 || optionalspriteIndex == 2)
         {
             color = Color.Yellow;
             canCollide = false;
         }
-        else if (colorIndex == 3 || optionalColorIndex == 3)
+        else if (spriteIndex == 3 || optionalspriteIndex == 3)
         {
             color = Color.Green;
             canCollide = false;
         }
-        else if (colorIndex > 3 || optionalColorIndex > 3)
+        else if (spriteIndex > 3 || optionalspriteIndex > 3)
         {
-            color = Color.OffWhite;
-            colorIndex = -1;
+            color = Color.Clear;
+            spriteIndex = -1;
         }
     }
 
@@ -87,14 +90,21 @@ public class Tile
 
     }
 
-    public void UpdateColor(Color newColor)
+    public void UpdateSprite(Texture2D newSprite)
     {
-        color = newColor;
+        sprite = newSprite;
     }
 
     public void Render()
     {
-        Draw.FillColor = color;
-        Draw.Square(position, size);
+        if (spriteIndex == 0)
+        {
+            Graphics.Draw(sprite, position);
+        }
+        else
+        {
+            Draw.FillColor = color;
+            Draw.Square(position, size);
+        }
     }
 }
