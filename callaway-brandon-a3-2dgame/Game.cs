@@ -10,31 +10,21 @@ namespace Game10003;
 /// </summary>
 public class Game
 {
-    // Place your variables here:
     public static int windowWidth = 800;
     public static int windowHeight = 600;
 
-    public static Texture2D caveTexture;
-    static Texture2D backgroundTexture;
-
-    Player player;
-    LevelEditor Editor;
+    //Player player;
+    SceneHandler sceneHandler;
     
-
-
-    /// <summary>
-    ///     Setup runs once before the game loop begins.
-    /// </summary>
     public void Setup()
     {
         InitializeWindow();
-        InitializeTextures();
 
-        player = new Player();
+        //player = new Player();
 
-        // Setup Editor
-        Editor = new LevelEditor();
-        Editor.Setup();
+        // Setup Scene Handler
+        sceneHandler = new SceneHandler();
+        sceneHandler.Setup();
     }
 
     void InitializeWindow()
@@ -44,17 +34,12 @@ public class Game
         Window.TargetFPS = 60;
     }
 
-    void InitializeTextures()
-    {
-        caveTexture = Graphics.LoadTexture("../../../assets/textures/caveTexture.png");
-        backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture.png");
-    }
+
     public void Update()
     {
         Window.ClearBackground(Color.Black);
-        Graphics.Draw(backgroundTexture, 0, 0);
-        player.Handle();
 
-        Editor.Update();
+        sceneHandler.Update();
+        //player.Handle();
     }
 }

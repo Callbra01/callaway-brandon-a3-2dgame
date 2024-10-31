@@ -12,7 +12,6 @@ public class Player
     int playerSpeed = 50;
     int gravityForce = 10;
 
-
     public void Handle()
     {
         HandleInput();
@@ -61,7 +60,7 @@ public class Player
 
     void Render()
     {
-        Draw.FillColor = Color.Black;
+        Draw.FillColor = Color.White;
         Draw.Square(position, playerSize);
     }
 }

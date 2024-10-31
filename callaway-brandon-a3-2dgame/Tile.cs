@@ -58,7 +58,7 @@ public class Tile
         else if (spriteIndex == 0 || optionalspriteIndex == 0)
         {
             color = Color.Blue;
-            sprite = Game.caveTexture;
+            sprite = SceneHandler.caveTexture;
 
             canCollide = true;
         }

@@ -8,7 +8,8 @@ public class LevelEditor
     public int tileSize = 50;
     public int tileRowCount;
     public int tileColCount;
-    int levelSize = 3;
+    int levelHeight = 1;
+    int levelWidth = 2;
 
     public Tile[] tileArray;
     public Vector2[] tilePositions;
@@ -18,11 +19,17 @@ public class LevelEditor
     int[] tileColorIndexVals;
     LevelHandler levelHandler;
 
+    public LevelEditor(int newLevelWidth, int newLevelHeight)
+    {
+        levelWidth = newLevelWidth;
+        levelHeight = newLevelHeight;
+    }
+
     public void Setup()
     {
         // Populate tile array with a given amount of tiles
-        tileRowCount = Game.windowHeight / tileSize;
-        tileColCount = (Game.windowWidth / tileSize) * levelSize;
+        tileRowCount = (Game.windowHeight / tileSize) * levelHeight;
+        tileColCount = (Game.windowWidth / tileSize) * levelWidth;
         tileArray = new Tile[tileRowCount * tileColCount];
         tilePositions = new Vector2[tileArray.Length];
 
@@ -45,7 +52,6 @@ public class LevelEditor
         {
             tileArray[tile] = new Tile();
             tileArray[tile].position = tilePositions[tile];
-            
         }
     }
 
@@ -69,7 +75,7 @@ public class LevelEditor
     // Save or Load depending on input
     void HandleInput()
     {
-        if(Input.IsKeyboardKeyPressed(KeyboardInput.Q))
+        if (Input.IsKeyboardKeyPressed(KeyboardInput.Q))
         {
             levelHandler.SaveLevel("../../../assets/levels/levelEditor0.txt", tileArray);
         }
@@ -85,23 +91,38 @@ public class LevelEditor
             }
         }
 
-        /* DEBUG INPUT
-        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
+        ///* DEBUG INPUT
+        if (Input.IsKeyboardKeyDown(KeyboardInput.D))
         {
             for (int tile = 0; tile < tileArray.Length; tile++)
             {
                 tileArray[tile].position.X -= 1000 * Time.DeltaTime;
             }
         }
-        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.A))
         {
             for (int tile = 0; tile < tileArray.Length; tile++)
             {
                 tileArray[tile].position.X += 1000 * Time.DeltaTime;
             }
         }
-        */
 
+        if (Input.IsKeyboardKeyDown(KeyboardInput.S))
+        {
+            for (int tile = 0; tile < tileArray.Length; tile++)
+            {
+                tileArray[tile].position.Y -= 1000 * Time.DeltaTime;
+            }
+        }
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.W))
+        {
+            for (int tile = 0; tile < tileArray.Length; tile++)
+            {
+                tileArray[tile].position.Y += 1000 * Time.DeltaTime;
+            }
+        }
+
+        //*/
     }
 
     void MouseCollisionCheck()
@@ -142,7 +163,7 @@ public class LevelEditor
                 if (mouseIntersectsY)
                 {
                     if (Input.IsMouseButtonPressed(MouseInput.Right))
-                    { 
+                    {
                         tileArray[tile].UpdateColorIndex();
                     }
                 }

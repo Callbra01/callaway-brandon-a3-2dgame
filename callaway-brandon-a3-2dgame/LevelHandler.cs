@@ -6,7 +6,6 @@ namespace Game10003;
 
 public class LevelHandler
 {
-    // TODO: CHECK WITH RAPH IF THIS IS OKAY
     public int[] LoadLevel(string filePath, int[] tileArrayVar)
     {
         // Read string from file path
