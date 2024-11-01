@@ -12,8 +12,13 @@ public class Player
     int playerSpeed = 50;
     int gravityForce = 10;
 
+    Texture2D texture;
 
-    public void Handle()
+    public Player()
+    {
+        texture = Graphics.LoadTexture("../../../assets/wretchTexture.png");
+    }
+    public void Update()
     {
         HandleInput();
         Render();
@@ -21,7 +26,6 @@ public class Player
 
     void HandleInput()
     {
-        
         if (Input.IsKeyboardKeyDown(KeyboardInput.A))
         {
             velocity.X -= playerSpeed;
@@ -61,7 +65,7 @@ public class Player
 
     void Render()
     {
-        Draw.FillColor = Color.Black;
+        Draw.FillColor = Color.White;
         Draw.Square(position, playerSize);
     }
 }

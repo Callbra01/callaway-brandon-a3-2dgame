@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Numerics;
 
 namespace Game10003;
@@ -8,7 +9,8 @@ public class LevelEditor
     public int tileSize = 50;
     public int tileRowCount;
     public int tileColCount;
-    int levelSize = 3;
+    public int levelSize = 3;
+    public string levelName = "levelEditor";
 
     public Tile[] tileArray;
     public Vector2[] tilePositions;
@@ -16,7 +18,6 @@ public class LevelEditor
     bool mouseIntersectsY = false;
 
     int[] tileColorIndexVals;
-    LevelHandler levelHandler;
 
     public void Setup()
     {
@@ -25,8 +26,6 @@ public class LevelEditor
         tileColCount = (Game.windowWidth / tileSize) * levelSize;
         tileArray = new Tile[tileRowCount * tileColCount];
         tilePositions = new Vector2[tileArray.Length];
-
-        levelHandler = new LevelHandler();
 
         // index starts at 0, loop through rows and columns to get new position via tile size. 
         int tilePositionIndex = 0;
@@ -45,15 +44,24 @@ public class LevelEditor
         {
             tileArray[tile] = new Tile();
             tileArray[tile].position = tilePositions[tile];
-            
+        }
+    }
+
+    public void UpdateLevel()
+    {
+        if (levelName == "levelEditor")
+        {
+
         }
     }
 
     public void Update()
     {
+
+        UpdateLevel();
         Render();
         MouseCollisionCheck();
-        HandleInput();
+        HandleEditorInput();
     }
 
     // Draw all tiles
@@ -67,17 +75,17 @@ public class LevelEditor
     }
 
     // Save or Load depending on input
-    void HandleInput()
+    void HandleEditorInput()
     {
         if(Input.IsKeyboardKeyPressed(KeyboardInput.Q))
         {
-            levelHandler.SaveLevel("../../../assets/levels/levelEditor0.txt", tileArray);
+            SaveLevel("../../../assets/levels/mainLevel0.txt", tileArray);
         }
         else if (Input.IsKeyboardKeyPressed(KeyboardInput.E))
         {
             tileColorIndexVals = new int[tileArray.Length];
 
-            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelEditor0.txt", tileColorIndexVals);
+            tileColorIndexVals = LoadLevel("../../../assets/levels/mainLevel0.txt", tileColorIndexVals);
 
             for (int i = 0; i < tileArray.Length; i++)
             {
@@ -85,7 +93,7 @@ public class LevelEditor
             }
         }
 
-        /* DEBUG INPUT
+        ///* DEBUG INPUT
         if (Input.IsKeyboardKeyDown(KeyboardInput.A))
         {
             for (int tile = 0; tile < tileArray.Length; tile++)
@@ -100,7 +108,7 @@ public class LevelEditor
                 tileArray[tile].position.X += 1000 * Time.DeltaTime;
             }
         }
-        */
+        //*/
 
     }
 
@@ -108,7 +116,7 @@ public class LevelEditor
     {
         for (int tile = 0; tile < tileArray.Length; tile++)
         {
-            int currentColorIndex = tileArray[tile].spriteIndex;
+            int currentColorIndex;
 
             // Left alt wipes the screen
             if (Input.IsKeyboardKeyDown(KeyboardInput.LeftAlt))
@@ -142,7 +150,7 @@ public class LevelEditor
                 if (mouseIntersectsY)
                 {
                     if (Input.IsMouseButtonPressed(MouseInput.Right))
-                    { 
+                    {
                         tileArray[tile].UpdateColorIndex();
                     }
                 }
@@ -166,5 +174,40 @@ public class LevelEditor
                 }
             }
         }
+    }
+
+    public int[] LoadLevel(string filePath, int[] tileArrayVar)
+    {
+        // Read string from file path
+        StreamReader streamReader = new StreamReader(filePath);
+
+        string[] tempStringArray = streamReader.ReadToEnd().Split('_');
+
+        int[] tempIntArray = new int[tempStringArray.Length];
+
+        for (int spriteIndex = 0; spriteIndex < tempIntArray.Length; spriteIndex++)
+        {
+            int currentValue;
+            string currentChar = tempStringArray[spriteIndex];
+            if (int.TryParse(currentChar, out currentValue))
+            {
+                tempIntArray[spriteIndex] = currentValue;
+            }
+        }
+        streamReader.Close();
+
+        return tempIntArray;
+    }
+
+    public void SaveLevel(string levelFilePath, Tile[] tileArrayVar)
+    {
+        // Write int array to string
+        StreamWriter streamWriter = new StreamWriter(levelFilePath);
+
+        for (int tile = 0; tile < tileArrayVar.Length; tile++)
+        {
+            streamWriter.Write($"{tileArrayVar[tile].spriteIndex}{'_'}");
+        }
+        streamWriter.Close();
     }
 }

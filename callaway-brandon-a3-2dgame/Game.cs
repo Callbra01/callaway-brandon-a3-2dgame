@@ -17,8 +17,8 @@ public class Game
     public static Texture2D caveTexture;
     static Texture2D backgroundTexture;
 
-    Player player;
-    LevelEditor Editor;
+    //Player player;
+    SceneHandler sceneHandler;
     
 
 
@@ -30,11 +30,9 @@ public class Game
         InitializeWindow();
         InitializeTextures();
 
-        player = new Player();
-
-        // Setup Editor
-        Editor = new LevelEditor();
-        Editor.Setup();
+        //player = new Player();
+        sceneHandler = new SceneHandler();
+        sceneHandler.Setup();
     }
 
     void InitializeWindow()
@@ -53,8 +51,8 @@ public class Game
     {
         Window.ClearBackground(Color.Black);
         Graphics.Draw(backgroundTexture, 0, 0);
-        player.Handle();
+        //player.Update();
 
-        Editor.Update();
+        sceneHandler.Update();
     }
 }
