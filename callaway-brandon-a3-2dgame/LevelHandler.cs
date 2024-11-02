@@ -6,13 +6,12 @@ namespace Game10003;
 
 public class LevelHandler
 {
+    // Read string from file path
     public int[] LoadLevel(string filePath, int[] tileArrayVar)
     {
-        // Read string from file path
         StreamReader streamReader = new StreamReader(filePath);
 
         string[] tempStringArray = streamReader.ReadToEnd().Split('_');
-
         int[] tempIntArray = new int[tempStringArray.Length];
 
         for (int spriteIndex = 0; spriteIndex < tempIntArray.Length; spriteIndex++)
@@ -29,6 +28,7 @@ public class LevelHandler
         return tempIntArray;
     }
 
+    // Write an array of ints to a given file path
     public void SaveLevel(string levelFilePath, Tile[] tileArrayVar)
     {
         // Write int array to string

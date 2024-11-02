@@ -11,6 +11,8 @@ public class Player
     int playerSize = 50;
     int playerSpeed = 50;
     int gravityForce = 10;
+    string playerName = "";
+    int playerClass;
 
     public void Handle()
     {

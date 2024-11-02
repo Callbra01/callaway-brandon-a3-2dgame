@@ -137,7 +137,7 @@ public class LevelEditor
                 tileArray[tile].UpdateColorIndex(-1);
             }
 
-            // Keep track to tiles that intersect mouseX and mouseY
+            // Keep track to tiles that intersect mouseX
             if (Input.GetMousePosition().X >= tileArray[tile].position.X + 2 && Input.GetMousePosition().X <= tileArray[tile].position.X + tileSize - 2)
             {
                 mouseIntersectsX = true;
@@ -147,6 +147,7 @@ public class LevelEditor
                 mouseIntersectsX = false;
             }
 
+            // Keep track to tiles that intersect mouseY
             if (Input.GetMousePosition().Y >= tileArray[tile].position.Y + 2 && Input.GetMousePosition().Y <= tileArray[tile].position.Y + tileSize - 2)
             {
                 mouseIntersectsY = true;
