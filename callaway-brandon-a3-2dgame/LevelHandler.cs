@@ -11,6 +11,7 @@ public class LevelHandler
     {
         StreamReader streamReader = new StreamReader(filePath);
 
+        // Split level file by '_'s to separate individual tile sprites
         string[] tempStringArray = streamReader.ReadToEnd().Split('_');
         int[] tempIntArray = new int[tempStringArray.Length];
 
@@ -18,6 +19,7 @@ public class LevelHandler
         {
             int currentValue;
             string currentChar = tempStringArray[spriteIndex];
+            // If parse is successful, populate tile array with the given tile sprite values
             if (int.TryParse(currentChar, out currentValue))
             {
                 tempIntArray[spriteIndex] = currentValue;

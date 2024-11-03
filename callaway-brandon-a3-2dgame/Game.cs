@@ -5,8 +5,8 @@ namespace Game10003;
 
 public class Game
 {
-    public static int windowWidth = 800;
-    public static int windowHeight = 600;
+    static int windowWidth = 800;
+    static int windowHeight = 600;
 
     SceneHandler sceneHandler;
     
@@ -14,7 +14,6 @@ public class Game
     {
         InitializeWindow();
 
-        // Setup Scene Handler
         sceneHandler = new SceneHandler();
         sceneHandler.Setup();
     }

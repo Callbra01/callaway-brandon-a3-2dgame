@@ -11,7 +11,7 @@ namespace Game10003;
  */
 public class SceneHandler
 {
-    public int currentScene = 2;
+    public int currentScene = 4;
     static Texture2D avarusSplashTexture;
     Color blackSplashColor = new Color(0, 0, 0, 254);
 
@@ -23,11 +23,15 @@ public class SceneHandler
     static Texture2D levelEditorButton;
     static Texture2D exitButton;
 
-
     int buttonTracker = 0;
     float timeTracker = 0;
+
+    Player player;
+
     LevelEditor Editor;
     LevelHandler levelHandler;
+
+    Level levelOne;
 
     bool isPlayerTyping = false;
     string tempString = string.Empty;
@@ -40,6 +44,12 @@ public class SceneHandler
         Editor.Setup();
 
         levelHandler = new LevelHandler();
+
+        levelOne = new Level(2, 1);
+        levelOne.Setup();
+
+        player = new Player();
+        
     }
 
     public void Update()
@@ -68,7 +78,19 @@ public class SceneHandler
         }
         else if (currentScene == 4)
         {
-            //LevelOne();
+            Graphics.Draw(backgroundTexture, 0, 0);
+            levelOne.Render();
+            player.Handle();
+            for (int i = 0; i < levelOne.tileArray.Length; i++)
+            {
+                if (levelOne.tileArray[i].spriteIndex == 0)
+                {
+                    player.HandleCollision(levelOne.tileArray[i]);
+                }
+
+                //Console.WriteLine(player.position.X);
+            }
+            
         }
     }
 
@@ -76,7 +98,7 @@ public class SceneHandler
     {
         Graphics.Draw(avarusSplashTexture, 0, 0);
         Draw.FillColor = blackSplashColor;
-        Draw.Rectangle(0, 0, Game.windowWidth, Game.windowHeight);
+        Draw.Rectangle(0, 0, Window.Width, Window.Height);
 
         timeTracker += Time.DeltaTime;
 
@@ -118,7 +140,7 @@ public class SceneHandler
         if (blackSplashColor.A >= 1)
         {
             Draw.FillColor = blackSplashColor;
-            Draw.Rectangle(0, 0, Game.windowWidth, Game.windowHeight);
+            Draw.Rectangle(0, 0, Window.Width, Window.Height);
             blackSplashColor.A -= 2;
         }
 
@@ -142,7 +164,7 @@ public class SceneHandler
         {
             if (buttonTracker == 0)
             {
-                currentScene = 3;
+                currentScene = 4;
             }
             else if (buttonTracker == 1)
             {
@@ -173,10 +195,6 @@ public class SceneHandler
         Editor.Update();
     }
 
-
-
-
-
     void InitializeTextures()
     {
         backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture.png");
@@ -201,6 +219,7 @@ public class SceneHandler
         Text.Color = Color.White;
         Text.Draw($"{tempString}", 40, 40);
     }
+
     void CheckForTextInput()
     {
         string myString = "";

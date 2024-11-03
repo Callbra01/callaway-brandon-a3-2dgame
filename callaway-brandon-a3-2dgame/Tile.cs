@@ -10,7 +10,7 @@ public class Tile
     public int size;
     Color color;
     Texture2D sprite;
-    public bool canCollide;
+    public bool canCollide = false;
 
     public int spriteIndex = -1;
     //public int nextspriteIndex = 0;
@@ -80,14 +80,9 @@ public class Tile
         else if (spriteIndex > 3 || optionalspriteIndex > 3)
         {
             color = Color.Clear;
+            canCollide = false;
             spriteIndex = -1;
         }
-    }
-
-    // TODO SETUP COLLISION CHECK
-    public void CollisionCheck(Tile tile)
-    {
-
     }
 
     public void UpdateSprite(Texture2D newSprite)
@@ -95,7 +90,7 @@ public class Tile
         sprite = newSprite;
     }
 
-    public void Render()
+    public void Render(bool Outline)
     {
         if (spriteIndex == 0)
         {
@@ -104,6 +99,10 @@ public class Tile
         else
         {
             Draw.FillColor = color;
+            if (!Outline)
+            {
+                Draw.LineColor = Color.Clear;
+            }
             Draw.Square(position, size);
         }
     }

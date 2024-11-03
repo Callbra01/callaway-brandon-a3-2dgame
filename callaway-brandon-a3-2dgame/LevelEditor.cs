@@ -28,8 +28,8 @@ public class LevelEditor
     public void Setup()
     {
         // Populate tile array with a given amount of tiles
-        tileRowCount = (Game.windowHeight / tileSize) * levelHeight;
-        tileColCount = (Game.windowWidth / tileSize) * levelWidth;
+        tileRowCount = (Window.Height / tileSize) * levelHeight;
+        tileColCount = (Window.Width / tileSize) * levelWidth;
         tileArray = new Tile[tileRowCount * tileColCount];
         tilePositions = new Vector2[tileArray.Length];
 
@@ -68,7 +68,7 @@ public class LevelEditor
         // Render all tiles in tile array
         for (int i = 0; i < tileArray.Length; i++)
         {
-            tileArray[i].Render();
+            tileArray[i].Render(true);
         }
     }
 
