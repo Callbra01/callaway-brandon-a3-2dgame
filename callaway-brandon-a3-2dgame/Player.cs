@@ -9,10 +9,10 @@ public class Player
     // Player variables
     string playerName = "";
     int playerClass;
-    int playerSize = 50;
+    int playerSize = 100;
 
     // Motion variables
-    public Vector2 position = new Vector2(350, 250);
+    public Vector2 position = new Vector2(400, 250);
     Vector2 velocity = new Vector2(0, 0);
     int playerSpeed = 500;
     int playerMaxSpeed = 1000;
@@ -22,22 +22,25 @@ public class Player
 
     // Animation variables
     Texture2D[] idleFrames;
-    Texture2D[] runFrames;
+    Texture2D[] runRightFrames;
+    Texture2D[] runLeftFrames;
     int currentFrame = 0;
-    float animationSpeed = 5f;
+    float animationSpeed = 10f;
     float currentFloatFrame = 0;
 
     public Player()
     {
         // Initialize animation frames
         idleFrames = new Texture2D[5];
-        runFrames = new Texture2D[5];
+        runRightFrames = new Texture2D[5];
+        runLeftFrames = new Texture2D[5];
 
         for (int frame = 0; frame < idleFrames.Length; frame++)
         {
             //idleFrames[frame] = new Texture2D();
-            idleFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/idleFrame{frame + 1}.png");
-            runFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/runFrame{frame + 1}.png");
+            idleFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/idle/idleFrame{frame + 1}.png");
+            runRightFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/runRight/runFrame{frame + 1}.png");
+            runLeftFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/runLeft/runFrame{frame + 1}.png");
         }
     }
 
@@ -62,8 +65,9 @@ public class Player
 
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Space))
         {
-            velocity.Y -= playerSpeed;
+            velocity.Y -= velocity.Y + playerSpeed;
         }
+
         //velocity.Y += gravityForce * Time.DeltaTime * 100;
         
         position += velocity * Time.DeltaTime;
@@ -102,7 +106,7 @@ public class Player
             velocity = new Vector2(0, 0);
         }
         */
-        
+
         Vector2 tilePosition = tile.position;
         float tileSize = tile.size;
 
@@ -111,22 +115,35 @@ public class Player
         float tileEdgeTop = tilePosition.Y;
         float tileEdgeBottom = tilePosition.Y + tileSize;
 
-        float playerEdgeLeft = position.X;
+        float playerEdgeLeft = position.X -2;
         float playerEdgeRight = position.X + playerSize;
         float playerEdgeTop = position.Y;
         float playerEdgeBottom = position.Y + playerSize;
 
-        bool doesOverlapLeft = playerEdgeLeft < tileEdgeRight;
-        bool doesOverlapRight = playerEdgeRight > tileEdgeLeft;
-        bool doesOverlapTop = playerEdgeTop < tileEdgeBottom;
-        bool doesOverlapBottom = playerEdgeBottom > tileEdgeTop;
+        bool doesCollideLeft = playerEdgeLeft < tileEdgeRight;
+        bool doesCollideRight = playerEdgeRight > tileEdgeLeft;
+        bool doesCollideTop = playerEdgeTop < tileEdgeBottom + 5;
+        bool doesCollideBottom = playerEdgeBottom > tileEdgeTop;
 
-        bool isColliding = doesOverlapLeft && doesOverlapRight && doesOverlapTop && doesOverlapBottom && tile.canCollide;
+        bool isColliding = doesCollideLeft && doesCollideRight && doesCollideTop && doesCollideBottom && tile.canCollide;
 
-        //if (isColliding)
-        //{
-        //   velocity = new Vector2(0, 0);
-        //}
+
+        if (tile.canCollide && isColliding)
+        {
+
+
+            if (doesCollideRight && velocity.X > 0)
+            {
+                position.X = tile.position.X - playerSize;
+            }
+            else if (doesCollideLeft && velocity.X < 0)
+            {
+                position.X = tile.position.X + tileSize;
+            }
+
+        }
+
+        //Console.WriteLine(velocity.X);
     }
 
     void Render()
@@ -167,10 +184,16 @@ public class Player
         {
             Graphics.Draw(idleFrames[currentFrame], position);
         }
-        else
+        else if (velocity.X > 0)
         {
-            Graphics.Draw(runFrames[currentFrame], position);
+            Graphics.Draw(runRightFrames[currentFrame], position);
         }
+        else if (velocity.X < 0)
+        {
+            Graphics.Draw(runLeftFrames[currentFrame], position);
+        }
+            
+        
 
 
         //Draw.Square(position, playerSize);

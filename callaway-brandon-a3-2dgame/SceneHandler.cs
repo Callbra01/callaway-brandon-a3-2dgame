@@ -79,11 +79,14 @@ public class SceneHandler
         else if (currentScene == 4)
         {
             Graphics.Draw(backgroundTexture, 0, 0);
+            Draw.FillColor = Color.White;
+            Draw.Rectangle(0, 0, 800, 600);
             levelOne.Render();
             player.Handle();
+
             for (int i = 0; i < levelOne.tileArray.Length; i++)
             {
-                if (levelOne.tileArray[i].spriteIndex == 0)
+                if (levelOne.tileArray[i].canCollide)
                 {
                     player.HandleCollision(levelOne.tileArray[i]);
                 }
