@@ -12,23 +12,19 @@ public class Game
     
     public void Setup()
     {
-        InitializeWindow();
+        Window.SetTitle("Potato Adventure");
+        Window.SetSize(windowWidth, windowHeight);
+        Window.TargetFPS = 60;
 
         sceneHandler = new SceneHandler();
         sceneHandler.Setup();
-    }
-
-    void InitializeWindow()
-    {
-        Window.SetTitle("bGame");
-        Window.SetSize(windowWidth, windowHeight);
-        Window.TargetFPS = 60;
     }
 
     public void Update()
     {
         Window.ClearBackground(Color.Black);
 
+        // All game scenes and logic is handle in sceneHandler class
         sceneHandler.Update();
     }
 }

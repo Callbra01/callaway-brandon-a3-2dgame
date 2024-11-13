@@ -11,6 +11,7 @@ public class Tile
     Color color;
     Texture2D sprite;
     public bool canCollide = false;
+    public bool isEnemy = false;
 
     public int spriteIndex = -1;
     //public int nextspriteIndex = 0;
@@ -65,22 +66,20 @@ public class Tile
         else if (spriteIndex == 1 || optionalspriteIndex == 1)
         {
             color = Color.Red;
-            canCollide = false;
+            isEnemy = true;
+            canCollide = true;
         }
         else if (spriteIndex == 2 || optionalspriteIndex == 2)
         {
             color = Color.Yellow;
-            canCollide = false;
         }
         else if (spriteIndex == 3 || optionalspriteIndex == 3)
         {
             color = Color.Green;
-            canCollide = false;
         }
         else if (spriteIndex > 3 || optionalspriteIndex > 3)
         {
             color = Color.Clear;
-            canCollide = false;
             spriteIndex = -1;
         }
     }
@@ -95,6 +94,10 @@ public class Tile
         if (spriteIndex == 0)
         {
             Graphics.Draw(sprite, position);
+        }
+        else if (spriteIndex == 1)
+        {
+            Enemy newEnemy = new Enemy("spider", position);
         }
         else
         {

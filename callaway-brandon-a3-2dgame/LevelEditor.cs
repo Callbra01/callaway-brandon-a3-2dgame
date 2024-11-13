@@ -9,15 +9,18 @@ public class LevelEditor
     public int tileRowCount;
     public int tileColCount;
     int levelHeight = 1;
-    int levelWidth = 2;
+    int levelWidth = 4;
 
     public Tile[] tileArray;
     public Vector2[] tilePositions;
     bool mouseIntersectsX = false;
     bool mouseIntersectsY = false;
+    bool isInstructionTextVisable = true;
 
     int[] tileColorIndexVals;
     LevelHandler levelHandler;
+
+    string levelName = "";
 
     public LevelEditor(int newLevelWidth, int newLevelHeight)
     {
@@ -33,6 +36,7 @@ public class LevelEditor
         tileArray = new Tile[tileRowCount * tileColCount];
         tilePositions = new Vector2[tileArray.Length];
 
+        // Create new level handler to load and save the current level
         levelHandler = new LevelHandler();
 
         // index starts at 0, loop through rows and columns to get new position via tile size. 
@@ -62,7 +66,7 @@ public class LevelEditor
         HandleInput();
     }
 
-    // Draw all tiles
+    // Draw leveleditor Tiles
     void Render()
     {
         // Render all tiles in tile array
@@ -70,14 +74,31 @@ public class LevelEditor
         {
             tileArray[i].Render(true);
         }
+
+        // Render Level Editor Instruction Text
+        if (isInstructionTextVisable)
+        {
+            Draw.FillColor = new Color(0, 0, 0, 150);
+            Draw.Rectangle(0, 0, Window.Width, Window.Height);
+
+            Text.Color = Color.White;
+            Text.Draw("W,A,S,D: Move around level \n\n\nQ: Save Level \n\n\nE: Load Level \n\n\nLeft Alt: Wipe screen \n\n\n\nEnter: Show/Hide Instructions", 150, 100);
+        }
     }
 
     // Save or Load depending on input
     void HandleInput()
     {
+        // Enable and Disable Level Editor Instruction Test
+        if (Input.IsKeyboardKeyPressed(KeyboardInput.Enter))
+        {
+            isInstructionTextVisable = !isInstructionTextVisable;
+        }
+
+        // Save Current Level with Q and Load Level with E
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Q))
         {
-            levelHandler.SaveLevel("../../../assets/levels/levelEditor0.txt", tileArray);
+            levelHandler.SaveLevel("../../../assets/levels/testLevelOne.txt", tileArray);
         }
         else if (Input.IsKeyboardKeyPressed(KeyboardInput.E))
         {
@@ -91,7 +112,7 @@ public class LevelEditor
             }
         }
 
-        ///* DEBUG INPUT
+        // Handle Level Editor Movement
         if (Input.IsKeyboardKeyDown(KeyboardInput.D))
         {
             for (int tile = 0; tile < tileArray.Length; tile++)
@@ -107,6 +128,7 @@ public class LevelEditor
             }
         }
 
+        /*
         if (Input.IsKeyboardKeyDown(KeyboardInput.S))
         {
             for (int tile = 0; tile < tileArray.Length; tile++)
@@ -121,12 +143,12 @@ public class LevelEditor
                 tileArray[tile].position.Y += 1000 * Time.DeltaTime;
             }
         }
-
-        //*/
+        */
     }
 
     void MouseCollisionCheck()
     {
+        // Update Tile Index if a given tile is clicked
         for (int tile = 0; tile < tileArray.Length; tile++)
         {
             int currentColorIndex = tileArray[tile].spriteIndex;
@@ -146,7 +168,6 @@ public class LevelEditor
             {
                 mouseIntersectsX = false;
             }
-
             // Keep track to tiles that intersect mouseY
             if (Input.GetMousePosition().Y >= tileArray[tile].position.Y + 2 && Input.GetMousePosition().Y <= tileArray[tile].position.Y + tileSize - 2)
             {

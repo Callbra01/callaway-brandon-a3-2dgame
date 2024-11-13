@@ -12,17 +12,19 @@ namespace Game10003;
 public class SceneHandler
 {
     public int currentScene = 4;
+
+    // Splash screen variables
     static Texture2D avarusSplashTexture;
     Color blackSplashColor = new Color(0, 0, 0, 254);
 
     public static Texture2D caveTexture;
     static Texture2D backgroundTexture;
-    static Texture2D startScreenTexture;
 
+    // Start screen variables
+    static Texture2D startScreenTexture;
     static Texture2D startButton;
     static Texture2D levelEditorButton;
     static Texture2D exitButton;
-
     int buttonTracker = 0;
     float timeTracker = 0;
 
@@ -34,18 +36,18 @@ public class SceneHandler
     Level levelOne;
 
     bool isPlayerTyping = false;
-    string tempString = string.Empty;
+    string tempInputString = string.Empty;
 
     public void Setup()
     {
         InitializeTextures();
 
-        Editor = new LevelEditor(2, 2);
+        Editor = new LevelEditor(4, 1);
         Editor.Setup();
 
         levelHandler = new LevelHandler();
 
-        levelOne = new Level(2, 1);
+        levelOne = new Level(4, 1);
         levelOne.Setup();
 
         player = new Player();
@@ -74,15 +76,15 @@ public class SceneHandler
         }
         else if (currentScene == 3)
         {
-            CharacterCreator();
+
         }
         else if (currentScene == 4)
         {
             Graphics.Draw(backgroundTexture, 0, 0);
             Draw.FillColor = Color.White;
-            Draw.Rectangle(0, 0, 800, 600);
+            Draw.Rectangle(0, 0, 800, 800);
             levelOne.Render();
-            player.Handle();
+            player.Handle(levelOne.tileArray);
 
             for (int i = 0; i < levelOne.tileArray.Length; i++)
             {
@@ -93,7 +95,14 @@ public class SceneHandler
 
                 //Console.WriteLine(player.position.X);
             }
-            
+
+            if (player.position.Y > Window.Height)
+            {
+                currentScene = 3;
+                currentScene = 4;
+            }
+
+
         }
     }
 
@@ -178,19 +187,8 @@ public class SceneHandler
                 System.Environment.Exit(0);
             }
         }
-
-        // DEBUG INPUTS
-
-        if (Input.IsKeyboardKeyPressed(KeyboardInput.Backslash))
-        {
-            currentScene = 3;
-        }
     }
 
-    void CharacterCreator()
-    {
-        Text.Color = Color.White;
-    }
 
     void LevelEditor()
     {
@@ -214,13 +212,13 @@ public class SceneHandler
     {
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Enter))
         {
-            tempString = "";
+            tempInputString = "";
         }
 
         CheckForTextInput();
 
         Text.Color = Color.White;
-        Text.Draw($"{tempString}", 40, 40);
+        Text.Draw($"{tempInputString}", 40, 40);
     }
 
     void CheckForTextInput()
@@ -229,7 +227,7 @@ public class SceneHandler
 
         int maxCharacterCount = 10;
 
-        if (isPlayerTyping && tempString.Length < 10)
+        if (isPlayerTyping && tempInputString.Length < 10)
         {
             // 65-90 is defined as the alphabetic keys in Raylibs KeyboardKey Enum
             for (int kbChar = 65; kbChar <= 90; kbChar++)
@@ -240,14 +238,14 @@ public class SceneHandler
                     if (kbChar == 82)
                     {
                         //Console.WriteLine("R");
-                        myString = tempString.Insert(tempString.Length, "R");
-                        tempString = myString;
+                        myString = tempInputString.Insert(tempInputString.Length, "R");
+                        tempInputString = myString;
                     }
                     else
                     {
                         //Console.WriteLine((Raylib_cs.KeyboardKey)kbChar);
-                        myString = tempString.Insert(tempString.Length, ((Raylib_cs.KeyboardKey)kbChar).ToString());
-                        tempString = myString;
+                        myString = tempInputString.Insert(tempInputString.Length, ((Raylib_cs.KeyboardKey)kbChar).ToString());
+                        tempInputString = myString;
                     }
                 }
 
@@ -255,18 +253,8 @@ public class SceneHandler
                 // TODO: REMOVE LAST INDEX OF STRING
                 if (Input.IsKeyboardKeyPressed(KeyboardInput.Backspace))
                 {
-                    tempString = "";
+                    tempInputString = "";
                 }
-
-                // TODO THIS IS BROKEN, ADDS MULTIPLE SPACES
-                /* When the spacebar is pressed, add a space to the current index in the string
-                if (Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)32))
-                {
-                    myString = tempString.Insert(tempString.Length, " ");
-                    tempString = myString;
-                }
-                */
-
             }
         }
     }
