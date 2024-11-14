@@ -16,9 +16,12 @@ public class SceneHandler
     // Splash screen variables
     static Texture2D avarusSplashTexture;
     Color blackSplashColor = new Color(0, 0, 0, 254);
+    Sound splashSound;
 
-    public static Texture2D caveTexture;
     static Texture2D backgroundTexture;
+    public static Texture2D caveTexture;
+    public static Texture2D speedBoostTexture;
+    public static Texture2D jumpBoostTexture;
 
     // Start screen variables
     static Texture2D startScreenTexture;
@@ -28,30 +31,35 @@ public class SceneHandler
     int buttonTracker = 0;
     float timeTracker = 0;
 
-    Player player;
-
     LevelEditor Editor;
     LevelHandler levelHandler;
-
     Level levelOne;
+    Level levelTwo;
+    Player player;
 
-    bool isPlayerTyping = false;
-    string tempInputString = string.Empty;
+    Music levelMusic;
+
 
     public void Setup()
     {
         InitializeTextures();
 
-        Editor = new LevelEditor(4, 1);
-        Editor.Setup();
+        splashSound = Audio.LoadSound("../../../assets/audio/music/splashScreenMusic.wav");
+        Audio.SetVolume(splashSound, 0.5f);
 
+        levelMusic = Audio.LoadMusic("../../../assets/audio/music/levelMusic.wav");
+        Audio.SetVolume(levelMusic, 0.8f);
+
+        Editor = new LevelEditor(8, 1);
         levelHandler = new LevelHandler();
+        levelOne = new Level(8, 1, "LevelOne");
+        levelTwo = new Level(8, 1, "LevelTwo");
 
-        levelOne = new Level(4, 1);
+        player = new Player(new Vector2(400, 250));
+
+        Editor.Setup();
         levelOne.Setup();
-
-        player = new Player();
-        
+        levelTwo.Setup();
     }
 
     public void Update()
@@ -59,7 +67,7 @@ public class SceneHandler
         HandleScenes();
     }
 
-    // Handle scene transitions: 0 beginning splash screen, 1 start screen, 2 leveleditor, 3 character creator
+    // Handle scene transitions: 0 beginning splash screen, 1 start screen, 2 leveleditor, 3 game fail
     void HandleScenes()
     {
         if (currentScene == 0)
@@ -76,38 +84,83 @@ public class SceneHandler
         }
         else if (currentScene == 3)
         {
-
+            Audio.SetVolume(levelMusic, 0.2f);
         }
-        else if (currentScene == 4)
+        else if (currentScene >= 4)
         {
             Graphics.Draw(backgroundTexture, 0, 0);
             Draw.FillColor = Color.White;
             Draw.Rectangle(0, 0, 800, 800);
-            levelOne.Render();
-            player.Handle(levelOne.tileArray);
+            Audio.Play(levelMusic);
 
-            for (int i = 0; i < levelOne.tileArray.Length; i++)
+            if (currentScene == 4)
             {
-                if (levelOne.tileArray[i].canCollide)
+                Graphics.Draw(backgroundTexture, 0, 0);
+                Draw.FillColor = Color.White;
+                Draw.Rectangle(0, 0, 800, 800);
+                Audio.Play(levelMusic);
+
+                LevelLogic(levelOne);
+
+                if (player.playerHasExited)
                 {
-                    player.HandleCollision(levelOne.tileArray[i]);
+                    ResetLevel();
+                    currentScene = 5;
                 }
-
-                //Console.WriteLine(player.position.X);
             }
-
-            if (player.position.Y > Window.Height)
+            else if (currentScene == 5)
             {
-                currentScene = 3;
-                currentScene = 4;
+                player.playerHasExited = false;
+                LevelLogic(levelTwo);
+                if (player.playerHasExited)
+                {
+                    ResetLevel();
+                    currentScene = 6;
+                }
             }
+            else if (currentScene == 6)
+            {
 
+            }
+        }
+    }
 
+    // Resets player position and tile positions back to origin
+    void ResetLevel()
+    {
+        player.position.X = 400;
+        player.position.Y = 250;
+
+        for (int i = 0; i < levelOne.tileArray.Length; i++)
+        {
+            levelOne.tileArray[i].position.X = levelOne.tilePositions[i].X;
+        }
+    }
+
+    // Render level, handle player collision
+    void LevelLogic(Level level)
+    {
+        level.Render();
+        player.Handle(level.tileArray, currentScene);
+
+        for (int i = 0; i < level.tileArray.Length; i++)
+        {
+            player.HandleCollision(level.tileArray[i]);
+        }
+
+        if (player.position.Y > Window.Height)
+        {
+            currentScene = 3;
         }
     }
 
     void SplashScreen()
     {
+        if (!Audio.IsPlaying(splashSound))
+        {
+            Audio.Play(splashSound);
+        }
+
         Graphics.Draw(avarusSplashTexture, 0, 0);
         Draw.FillColor = blackSplashColor;
         Draw.Rectangle(0, 0, Window.Width, Window.Height);
@@ -189,7 +242,6 @@ public class SceneHandler
         }
     }
 
-
     void LevelEditor()
     {
         Graphics.Draw(backgroundTexture, 0, 0);
@@ -199,63 +251,15 @@ public class SceneHandler
     void InitializeTextures()
     {
         backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture.png");
-        caveTexture = Graphics.LoadTexture("../../../assets/textures/caveTexture.png");
         avarusSplashTexture = Graphics.LoadTexture("../../../assets/textures/avarusStudiosSplash.png");
 
         startScreenTexture = Graphics.LoadTexture("../../../assets/textures/startScreen.png");
         startButton = Graphics.LoadTexture("../../../assets/textures/startButton.png");
         levelEditorButton = Graphics.LoadTexture("../../../assets/textures/levelEditorButton.png");
         exitButton = Graphics.LoadTexture("../../../assets/textures/exitButton.png");
-    }
 
-    void TextInputUpdate()
-    {
-        if (Input.IsKeyboardKeyPressed(KeyboardInput.Enter))
-        {
-            tempInputString = "";
-        }
-
-        CheckForTextInput();
-
-        Text.Color = Color.White;
-        Text.Draw($"{tempInputString}", 40, 40);
-    }
-
-    void CheckForTextInput()
-    {
-        string myString = "";
-
-        int maxCharacterCount = 10;
-
-        if (isPlayerTyping && tempInputString.Length < 10)
-        {
-            // 65-90 is defined as the alphabetic keys in Raylibs KeyboardKey Enum
-            for (int kbChar = 65; kbChar <= 90; kbChar++)
-            {
-                if (Raylib.IsKeyPressed((Raylib_cs.KeyboardKey)kbChar))
-                {
-                    // 82 is used for both "R" and android's "menu" key, manually place "R"
-                    if (kbChar == 82)
-                    {
-                        //Console.WriteLine("R");
-                        myString = tempInputString.Insert(tempInputString.Length, "R");
-                        tempInputString = myString;
-                    }
-                    else
-                    {
-                        //Console.WriteLine((Raylib_cs.KeyboardKey)kbChar);
-                        myString = tempInputString.Insert(tempInputString.Length, ((Raylib_cs.KeyboardKey)kbChar).ToString());
-                        tempInputString = myString;
-                    }
-                }
-
-                // When the backspace key is pressed, wipe the string
-                // TODO: REMOVE LAST INDEX OF STRING
-                if (Input.IsKeyboardKeyPressed(KeyboardInput.Backspace))
-                {
-                    tempInputString = "";
-                }
-            }
-        }
+        caveTexture = Graphics.LoadTexture("../../../assets/textures/caveTexture.png");
+        speedBoostTexture = Graphics.LoadTexture("../../../assets/textures/speedBoostTexture.png");
+        jumpBoostTexture = Graphics.LoadTexture("../../../assets/textures/jumpBoostTexture.png");
     }
 }

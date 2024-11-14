@@ -24,7 +24,7 @@ public class Game
     {
         Window.ClearBackground(Color.Black);
 
-        // All game scenes and logic is handle in sceneHandler class
+        // All game scenes and logic is handled in sceneHandler class
         sceneHandler.Update();
     }
 }

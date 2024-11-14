@@ -14,14 +14,17 @@ public class Level
 
     public Tile[] tileArray;
     public Vector2[] tilePositions;
+    public string levelName = "";
 
     int[] tileSpriteIndexVals;
     LevelHandler levelHandler;
 
-    public Level(int newLevelWidth, int newLevelHeight)
+    // When level is constructed, get width height and name of text file
+    public Level(int newLevelWidth, int newLevelHeight, string newLevelName)
     {
         levelWidth = newLevelWidth;
         levelHeight = newLevelHeight;
+        levelName = newLevelName;
     }
 
     public void Setup()
@@ -46,18 +49,14 @@ public class Level
             }
         }
 
+        tileSpriteIndexVals = new int[tileArray.Length];
+        tileSpriteIndexVals = levelHandler.LoadLevel($"../../../assets/levels/{levelName}.txt", tileSpriteIndexVals);
+
         for (int tile = 0; tile < tileArray.Length; tile++)
         {
             tileArray[tile] = new Tile();
             tileArray[tile].position = tilePositions[tile];
-        }
-
-        tileSpriteIndexVals = new int[tileArray.Length];
-        tileSpriteIndexVals = levelHandler.LoadLevel("../../../assets/levels/testLevelOne.txt", tileSpriteIndexVals);
-    
-        for (int i = 0; i < tileArray.Length; i++)
-        {
-            tileArray[i].UpdateColorIndex(tileSpriteIndexVals[i]);
+            tileArray[tile].UpdateColorIndex(tileSpriteIndexVals[tile]);
         }
     }
 

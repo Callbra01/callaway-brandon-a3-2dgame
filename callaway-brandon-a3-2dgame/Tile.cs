@@ -11,7 +11,7 @@ public class Tile
     Color color;
     Texture2D sprite;
     public bool canCollide = false;
-    public bool isEnemy = false;
+    public bool isPowerUpActive = false;
 
     public int spriteIndex = -1;
     //public int nextspriteIndex = 0;
@@ -22,22 +22,6 @@ public class Tile
         position = new Vector2(0, 0);
         color = Color.Clear;
         size = 50;
-    }
-   
-    public void SetupPosition(Vector2 newPosition)
-    {
-        position = newPosition;
-    }
-
-    public void UpdatePosition(Vector2 newPosition, int newSize)
-    {
-        position = newPosition;
-        size = newSize;
-    }
-
-    public void ResetColorIndices()
-    {
-        this.spriteIndex = -1;
     }
 
     public void UpdateColorIndex(int optionalspriteIndex = -2)
@@ -58,7 +42,6 @@ public class Tile
         }
         else if (spriteIndex == 0 || optionalspriteIndex == 0)
         {
-            color = Color.Blue;
             sprite = SceneHandler.caveTexture;
 
             canCollide = true;
@@ -66,16 +49,17 @@ public class Tile
         else if (spriteIndex == 1 || optionalspriteIndex == 1)
         {
             color = Color.Red;
-            isEnemy = true;
             canCollide = true;
         }
         else if (spriteIndex == 2 || optionalspriteIndex == 2)
         {
-            color = Color.Yellow;
+            isPowerUpActive = true;
+            sprite = SceneHandler.jumpBoostTexture;
         }
         else if (spriteIndex == 3 || optionalspriteIndex == 3)
         {
-            color = Color.Green;
+            isPowerUpActive = true;
+            sprite = SceneHandler.speedBoostTexture;
         }
         else if (spriteIndex > 3 || optionalspriteIndex > 3)
         {
@@ -84,20 +68,18 @@ public class Tile
         }
     }
 
-    public void UpdateSprite(Texture2D newSprite)
-    {
-        sprite = newSprite;
-    }
-
     public void Render(bool Outline)
     {
         if (spriteIndex == 0)
         {
             Graphics.Draw(sprite, position);
         }
-        else if (spriteIndex == 1)
+        else if (spriteIndex == 3 || spriteIndex == 2)
         {
-            Enemy newEnemy = new Enemy("spider", position);
+            if (isPowerUpActive)
+            {
+                Graphics.Draw(sprite, position);
+            }
         }
         else
         {

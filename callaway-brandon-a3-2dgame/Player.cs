@@ -12,16 +12,14 @@ public class Player
     // Player variables
     string playerName = "";
     int playerClass;
-    int playerSize = 100; 
+    int playerSize = 100;
     // Motion variables
     public Vector2 position = new Vector2(400, 250);
     Vector2 velocity = new Vector2(0, 0);
-    int playerSpeed = 500;
+    public int playerSpeed = 500;
     int playerMaxSpeed = 1000;
     int gravityForce = 18;
     float friction = 50f;
-    bool canPlayerLeft = true;
-    bool canPlayerRight = true;
     bool isGrounded = false;
     float collisionOffset = 5;
     float jumpForce = 6f;
@@ -29,11 +27,11 @@ public class Player
     Vector2 playerBottom;
     Vector2 playerLeft;
     Vector2 playerRight;
+    public bool playerHasExited = false;
 
     // Level variables
-    Vector2[] playerBounds = [new Vector2(0, 0), new Vector2(530, 0), new Vector2(265, 0), new Vector2(265, 400)];
+    Vector2[] playerBounds = [new Vector2(0, 0), new Vector2(530, 0)];
     bool isPlayerInBounds = true;
-
 
     // Animation variables
     Texture2D[] idleFrames;
@@ -50,17 +48,27 @@ public class Player
     // Audio variables
     Sound caveFootstep;
     Sound grindTrack;
-    // Music variables
-    
+    Sound speedBoostSound;
+    Sound jumpBoostSound;
 
-    public Player()
+
+    public Player(Vector2 newPosition)
     {
+
+        position = newPosition; 
+
         // Initialize audio variables
         caveFootstep = Audio.LoadSound("../../../assets/audio/caveFootstep.wav");
-        Audio.SetVolume(caveFootstep, 0.1f);
+        Audio.SetVolume(caveFootstep, 0.3f);
 
         grindTrack = Audio.LoadSound("../../../assets/audio/music/grindTrack.wav");
         Audio.SetVolume(grindTrack, 0.5f);
+
+        jumpBoostSound = Audio.LoadSound("../../../assets/audio/JumpUpCollected.wav");
+        Audio.SetVolume(jumpBoostSound, 0.5f);
+
+        speedBoostSound = Audio.LoadSound("../../../assets/audio/powerUpCollected.wav");
+        Audio.SetVolume(speedBoostSound, 0.5f);
 
         // Initialize animation frame arrays
         idleFrames = new Texture2D[5];
@@ -80,7 +88,7 @@ public class Player
         }
     }
 
-    public void Handle(Tile[] tileArray)
+    public void Handle(Tile[] tileArray, int sceneCount)
     {
         MoveLevel(tileArray);
         HandleInput();
@@ -90,25 +98,22 @@ public class Player
     void MoveLevel(Tile[] tileArray)
     {
         Vector2 LeftBoundTopleft = new Vector2(playerBounds[0].X - (collisionOffset / 2), playerBounds[0].Y - (collisionOffset / 2));
-        Vector2 LeftBoundTopRight = new Vector2(playerBounds[0].X + 265 + (collisionOffset / 2), playerBounds[0].Y - (collisionOffset / 2));
+        Vector2 LeftBoundTopRight = new Vector2(playerBounds[0].X + 50 + (collisionOffset / 2), playerBounds[0].Y - (collisionOffset / 2));
         Vector2 LeftBoundBottomleft = new Vector2(playerBounds[0].X - (collisionOffset / 2), playerBounds[0].Y + Window.Height + (collisionOffset / 2));
-        Vector2 LeftBoundBottomRight = new Vector2(playerBounds[0].X + 265 + (collisionOffset / 2), playerBounds[0].Y + Window.Height + (collisionOffset / 2));
+        Vector2 LeftBoundBottomRight = new Vector2(playerBounds[0].X + 50 + (collisionOffset / 2), playerBounds[0].Y + Window.Height + (collisionOffset / 2));
 
         Vector2 RightBoundTopleft = new Vector2(playerBounds[1].X - (collisionOffset / 2), playerBounds[1].Y - (collisionOffset / 2));
         Vector2 RightBoundTopRight = new Vector2(playerBounds[1].X + 265 + (collisionOffset / 2), playerBounds[1].Y - (collisionOffset / 2));
         Vector2 RightBoundBottomleft = new Vector2(playerBounds[1].X - (collisionOffset / 2), playerBounds[1].Y + Window.Height + (collisionOffset / 2));
         Vector2 RightBoundBottomRight = new Vector2(playerBounds[1].X + 265 + (collisionOffset / 2), playerBounds[1].Y + Window.Height + (collisionOffset / 2));
 
+        // Prevent player from scrolling backwards
         if (playerLeft.X < LeftBoundTopRight.X && playerLeft.X > LeftBoundTopleft.X)
         {
             if (playerLeft.Y < LeftBoundBottomRight.Y && playerLeft.Y > LeftBoundTopRight.Y)
             {
                 velocity.X = 0;
                 position.X = LeftBoundTopRight.X;
-                for (int i = 0; i < tileArray.Length; i++)
-                {
-                    tileArray[i].position.X += 10;
-                }
             }
         }
         else if (playerRight.X > RightBoundTopleft.X && playerRight.X < RightBoundTopRight.X)
@@ -119,12 +124,11 @@ public class Player
                 position.X = RightBoundTopleft.X - playerSize;
                 for (int i = 0; i < tileArray.Length; i++)
                 {
-                    tileArray[i].position.X -= 10;
-                    
+                    tileArray[i].position.X -= playerSpeed / 50;
+
                 }
             }
         }
-
     }
 
     void HandleInput()
@@ -132,8 +136,6 @@ public class Player
         if (Input.IsKeyboardKeyDown(KeyboardInput.F))
         {
             isPlayerDancing = true;
-            canPlayerLeft = false;
-            canPlayerRight = false;
 
             // Reset the audio
             if (!Audio.IsPlaying(grindTrack))
@@ -145,29 +147,27 @@ public class Player
         {
             Audio.Stop(grindTrack);
             isPlayerDancing = false;
-            canPlayerLeft = true;
-            canPlayerRight = true;
         }
 
-        if (Input.IsKeyboardKeyDown(KeyboardInput.A) && canPlayerLeft)
+        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
         {
             velocity.X = -playerSpeed;
-            if (!Audio.IsPlaying(caveFootstep))
+            if (!Audio.IsPlaying(caveFootstep) && isGrounded)
             {
                 Audio.Play(caveFootstep);
             }
         }
-        else if (Input.IsKeyboardKeyDown(KeyboardInput.D) && canPlayerRight)
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
         {
             velocity.X = playerSpeed;
-            if (!Audio.IsPlaying(caveFootstep))
+            if (!Audio.IsPlaying(caveFootstep) && isGrounded)
             {
                 Audio.Play(caveFootstep);
             }
         }
         else
         {
-            if (velocity.X == 0)
+            if (velocity.X == 0 || !isGrounded)
             {
                 Audio.Stop(caveFootstep);
             }
@@ -211,34 +211,72 @@ public class Player
         Vector2 tileBottomLeft = new Vector2(tile.position.X - (collisionOffset / 2), tile.position.Y + tile.size + (collisionOffset / 2));
         Vector2 tileBottomRight = new Vector2(tile.position.X + tile.size + (collisionOffset / 2), tile.position.Y + tile.size + (collisionOffset / 2));
 
-        /*
-        Draw.FillColor = Color.Red;
-        Draw.Circle(tileTopLeft, 10);
-        Draw.Circle(tileTopRight, 10);
-        Draw.Circle(tileBottomLeft, 10);
-        Draw.Circle(tileBottomRight, 10);
-
-        Draw.Circle(playerTop, 10);
-        Draw.Circle(playerBottom, 10);
-        Draw.Circle(playerLeft, 10);
-        Draw.Circle(playerRight, 10);
-        */
-
         // Handle player left and right collision
         if (playerLeft.X < tileTopRight.X && playerLeft.X > tileTopLeft.X)
         {
             if (playerLeft.Y < tileBottomRight.Y && playerLeft.Y > tileTopRight.Y)
             {
-                velocity.X = 0;
-                position.X = tileTopRight.X;
+                // Handle Collision for bricks and power ups
+                if (tile.spriteIndex == 0)
+                {
+                    velocity.X = 0;
+                    position.X = tileTopRight.X;
+                }
+                // Jump powerup
+                else if (tile.spriteIndex == 2 && tile.isPowerUpActive)
+                {
+                    if (!Audio.IsPlaying(speedBoostSound))
+                    {
+                        Audio.Play(speedBoostSound);
+                    }
+                    jumpForce += 1f;
+                    tile.isPowerUpActive = false;
+                }
+                // Speed powerup
+                else if (tile.spriteIndex == 3 && tile.isPowerUpActive)
+                {
+                    if (!Audio.IsPlaying(speedBoostSound))
+                    {
+                        Audio.Play(speedBoostSound);
+                    }
+                    playerSpeed += 50;
+                    tile.isPowerUpActive = false;
+                }
+                else if (tile.spriteIndex == 1)
+                {
+                    playerHasExited = true;
+                }
+                
             }
         }
         else if (playerRight.X > tileTopLeft.X && playerRight.X < tileTopRight.X)
         {
             if (playerRight.Y < tileBottomLeft.Y && playerRight.Y > tileTopLeft.Y)
             {
-                velocity.X = 0;
-                position.X = tileTopLeft.X - playerSize;
+
+                if (tile.spriteIndex == 0)
+                {
+                    velocity.X = 0;
+                    position.X = tileTopLeft.X - playerSize;
+                }
+                else if (tile.spriteIndex == 2 && tile.isPowerUpActive)
+                {
+                    jumpForce += 1f;
+                    if (!Audio.IsPlaying(jumpBoostSound))
+                    {
+                        Audio.Play(jumpBoostSound);
+                    }
+                    tile.isPowerUpActive = false;
+                }
+                else if (tile.spriteIndex == 3 && tile.isPowerUpActive)
+                {
+                    playerSpeed += 50;
+                    if (!Audio.IsPlaying(speedBoostSound))
+                    {
+                        Audio.Play(speedBoostSound);
+                    }
+                    tile.isPowerUpActive = false;
+                }
             }
         }
 
@@ -247,8 +285,11 @@ public class Player
         {
             if (playerTop.X > tileTopLeft.X && playerTop.X < tileTopRight.X)
             {
-                velocity.Y = 0;
-                position.Y = tileBottomLeft.Y + 5;
+                if (tile.spriteIndex == 0)
+                {
+                    velocity.Y = 0;
+                    position.Y = tileBottomLeft.Y + 5;
+                }
             }
         }
         // Handle player floor collision
@@ -256,9 +297,12 @@ public class Player
         {
             if (playerBottom.X > tileTopLeft.X && playerBottom.X < tileTopRight.X)
             {
-                velocity.Y = 0;
-                isGrounded = true;
-                position.Y = tileTopLeft.Y - playerSize + 5;
+                if (tile.spriteIndex == 0)
+                {
+                    velocity.Y = 0;
+                    isGrounded = true;
+                    position.Y = tileTopLeft.Y - playerSize + 5;
+                }
             }
         }
     }
@@ -323,11 +367,5 @@ public class Player
         {
             Graphics.Draw(danceFrames[currentFrame], position);
         }
-        /*
-        //DEBUG BOUND VIEW
-        Draw.FillColor = new Color(255, 255, 255, 50);
-        Draw.Rectangle(playerBounds[0][0], playerBounds[0][1], 265, Window.Height);
-        Draw.Rectangle(playerBounds[1][0], playerBounds[1][1], 265, Window.Height);
-        */
     }
 }

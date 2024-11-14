@@ -98,13 +98,13 @@ public class LevelEditor
         // Save Current Level with Q and Load Level with E
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Q))
         {
-            levelHandler.SaveLevel("../../../assets/levels/testLevelOne.txt", tileArray);
+            levelHandler.SaveLevel("../../../assets/levels/levelTwo.txt", tileArray);
         }
         else if (Input.IsKeyboardKeyPressed(KeyboardInput.E))
         {
             tileColorIndexVals = new int[tileArray.Length];
 
-            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelEditor0.txt", tileColorIndexVals);
+            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelTwo.txt", tileColorIndexVals);
 
             for (int i = 0; i < tileArray.Length; i++)
             {
