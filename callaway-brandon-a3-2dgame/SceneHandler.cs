@@ -30,6 +30,7 @@ public class SceneHandler
     static Texture2D exitButton;
     int buttonTracker = 0;
     float timeTracker = 0;
+    float backgroundXOffset = 0;
 
     LevelEditor Editor;
     LevelHandler levelHandler;
@@ -38,7 +39,7 @@ public class SceneHandler
     Player player;
 
     Music levelMusic;
-
+    Sound playerScream;
 
     public void Setup()
     {
@@ -49,6 +50,9 @@ public class SceneHandler
 
         levelMusic = Audio.LoadMusic("../../../assets/audio/music/levelMusic.wav");
         Audio.SetVolume(levelMusic, 0.8f);
+
+        playerScream = Audio.LoadSound("../../../assets/audio/playerScream.wav");
+        Audio.SetVolume(playerScream, 2.5f);
 
         Editor = new LevelEditor(8, 1);
         levelHandler = new LevelHandler();
@@ -85,21 +89,22 @@ public class SceneHandler
         else if (currentScene == 3)
         {
             Audio.SetVolume(levelMusic, 0.2f);
+            if (!Audio.IsPlaying(playerScream))
+            {
+                Audio.Play(playerScream);
+            }
         }
         else if (currentScene >= 4)
         {
-            Graphics.Draw(backgroundTexture, 0, 0);
-            Draw.FillColor = Color.White;
-            Draw.Rectangle(0, 0, 800, 800);
+            Graphics.Draw(backgroundTexture, backgroundXOffset, 0);
+            
+
+            //Draw.FillColor = Color.White;
+            //Draw.Rectangle(0, 0, 800, 800);
             Audio.Play(levelMusic);
 
             if (currentScene == 4)
             {
-                Graphics.Draw(backgroundTexture, 0, 0);
-                Draw.FillColor = Color.White;
-                Draw.Rectangle(0, 0, 800, 800);
-                Audio.Play(levelMusic);
-
                 LevelLogic(levelOne);
 
                 if (player.playerHasExited)
@@ -142,6 +147,8 @@ public class SceneHandler
     {
         level.Render();
         player.Handle(level.tileArray, currentScene);
+
+        backgroundXOffset = level.tileArray[0].position.X * 0.5f;
 
         for (int i = 0; i < level.tileArray.Length; i++)
         {
@@ -250,8 +257,9 @@ public class SceneHandler
 
     void InitializeTextures()
     {
-        backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture.png");
+        backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture1.png");
         avarusSplashTexture = Graphics.LoadTexture("../../../assets/textures/avarusStudiosSplash.png");
+
 
         startScreenTexture = Graphics.LoadTexture("../../../assets/textures/startScreen.png");
         startButton = Graphics.LoadTexture("../../../assets/textures/startButton.png");

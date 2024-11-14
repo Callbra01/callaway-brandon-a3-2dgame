@@ -13,14 +13,15 @@ public class Player
     string playerName = "";
     int playerClass;
     int playerSize = 100;
+
     // Motion variables
     public Vector2 position = new Vector2(400, 250);
     Vector2 velocity = new Vector2(0, 0);
     public int playerSpeed = 500;
     int playerMaxSpeed = 1000;
     int gravityForce = 18;
-    float friction = 50f;
     bool isGrounded = false;
+    float friction = 50f;
     float collisionOffset = 5;
     float jumpForce = 6f;
     Vector2 playerTop;
@@ -40,7 +41,7 @@ public class Player
     Texture2D[] danceFrames;
     Texture2D[] jumpFrames;
     int currentFrame = 0;
-    float animationSpeed = 20f;
+    float animationSpeed = 11.85f;
     float currentFloatFrame = 0;
     bool isPlayerDancing = false;
     bool isPlayerJumping = false;
@@ -50,6 +51,7 @@ public class Player
     Sound grindTrack;
     Sound speedBoostSound;
     Sound jumpBoostSound;
+  
 
 
     public Player(Vector2 newPosition)
@@ -69,6 +71,8 @@ public class Player
 
         speedBoostSound = Audio.LoadSound("../../../assets/audio/powerUpCollected.wav");
         Audio.SetVolume(speedBoostSound, 0.5f);
+
+
 
         // Initialize animation frame arrays
         idleFrames = new Texture2D[5];
@@ -307,8 +311,7 @@ public class Player
         }
     }
 
-    // Render and Handle all animation frames
-    void Render()
+    void UpdateFrames()
     {
         // Update currentFloatFrame by delta time * scalar to allow for frame gaps
         currentFloatFrame += Time.DeltaTime * animationSpeed;
@@ -338,6 +341,11 @@ public class Player
         {
             currentFloatFrame = 0;
         }
+    }
+    // Render and Handle all animation frames
+    void Render()
+    {
+        UpdateFrames();
 
         // If the player is moving, display run animation. Otherwise, display idle animation
         if (velocity.X == 0 && !isPlayerDancing && !isPlayerJumping)
