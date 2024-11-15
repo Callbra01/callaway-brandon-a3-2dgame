@@ -35,33 +35,50 @@ public class Tile
             spriteIndex += 1;
         }
 
+        // Air tile
         if (spriteIndex == -1 || optionalspriteIndex == -1)
         {
             color = Color.Clear;
             canCollide = false;
         }
+        // Brick tile
         else if (spriteIndex == 0 || optionalspriteIndex == 0)
         {
             sprite = SceneHandler.caveTexture;
 
             canCollide = true;
         }
+        // Exit tile
         else if (spriteIndex == 1 || optionalspriteIndex == 1)
         {
             color = Color.Red;
             canCollide = true;
         }
+        // Jump boost tile
         else if (spriteIndex == 2 || optionalspriteIndex == 2)
         {
             isPowerUpActive = true;
             sprite = SceneHandler.jumpBoostTexture;
         }
+        // Speed boost tile
         else if (spriteIndex == 3 || optionalspriteIndex == 3)
         {
             isPowerUpActive = true;
             sprite = SceneHandler.speedBoostTexture;
         }
-        else if (spriteIndex > 3 || optionalspriteIndex > 3)
+        // Spike tile
+        else if (spriteIndex == 4 || optionalspriteIndex == 4)
+        {
+            sprite = SceneHandler.topSpikeTexture;
+            position.Y -= 15;
+        }
+        // Bottom Spike tile
+        else if (spriteIndex == 5 || optionalspriteIndex == 5)
+        {
+            sprite = SceneHandler.bottomSpikeTexture;
+            position.Y += 15;
+        }
+        else if (spriteIndex > 5 || optionalspriteIndex > 5)
         {
             color = Color.Clear;
             spriteIndex = -1;
@@ -70,7 +87,7 @@ public class Tile
 
     public void Render(bool Outline)
     {
-        if (spriteIndex == 0)
+        if (spriteIndex == 0 || spriteIndex == 4 || spriteIndex == 5)
         {
             Graphics.Draw(sprite, position);
         }

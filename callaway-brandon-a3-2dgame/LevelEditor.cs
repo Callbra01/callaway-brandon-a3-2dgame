@@ -9,7 +9,7 @@ public class LevelEditor
     public int tileRowCount;
     public int tileColCount;
     int levelHeight = 1;
-    int levelWidth = 4;
+    int levelWidth = 24;
 
     public Tile[] tileArray;
     public Vector2[] tilePositions;
@@ -98,13 +98,13 @@ public class LevelEditor
         // Save Current Level with Q and Load Level with E
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Q))
         {
-            levelHandler.SaveLevel("../../../assets/levels/levelThree.txt", tileArray);
+            levelHandler.SaveLevel("../../../assets/levels/levelFour.txt", tileArray);
         }
         else if (Input.IsKeyboardKeyPressed(KeyboardInput.E))
         {
             tileColorIndexVals = new int[tileArray.Length];
 
-            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelThree.txt", tileColorIndexVals);
+            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelFour.txt", tileColorIndexVals);
 
             for (int i = 0; i < tileArray.Length; i++)
             {

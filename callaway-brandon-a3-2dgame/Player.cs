@@ -30,10 +30,11 @@ public class Player
     public int playerScore = 0;
     bool isPlayerInBounds = true;
     Vector2[] playerBounds = [new Vector2(0, 0), new Vector2(530, 0)];
-    
+
 
     // Animation variables
-    bool isPlayerDancing = false;
+    public bool canPlayerMove = true;
+    public bool isPlayerDancing = false;
     bool isPlayerJumping = false;
     int currentFrame = 0;
     float animationSpeed = 11.85f;
@@ -46,7 +47,7 @@ public class Player
 
     // Audio variables
     Sound caveFootstep;
-    Sound grindTrack;
+    public Sound grindTrack;
     Sound speedBoostSound;
     Sound jumpBoostSound;
 
@@ -129,7 +130,6 @@ public class Player
                 for (int i = 0; i < tileArray.Length; i++)
                 {
                     tileArray[i].position.X -= playerSpeed / 50;
-
                 }
             }
         }
@@ -153,15 +153,15 @@ public class Player
             isPlayerDancing = false;
         }
 
-        if (Input.IsKeyboardKeyDown(KeyboardInput.A))
+        if (Input.IsKeyboardKeyDown(KeyboardInput.A) && canPlayerMove)
         {
             velocity.X = -playerSpeed;
-            if (!Audio.IsPlaying(caveFootstep) && isGrounded)
+            if (!Audio.IsPlaying(caveFootstep) && isGrounded && canPlayerMove)
             {
                 Audio.Play(caveFootstep);
             }
         }
-        else if (Input.IsKeyboardKeyDown(KeyboardInput.D))
+        else if (Input.IsKeyboardKeyDown(KeyboardInput.D) && canPlayerMove)
         {
             velocity.X = playerSpeed;
             if (!Audio.IsPlaying(caveFootstep) && isGrounded)
@@ -178,7 +178,7 @@ public class Player
         }
 
         // If player can jump, allow jump. If player is already jumping, dont allow another jump
-        if (Input.IsKeyboardKeyPressed(KeyboardInput.Space) && !isPlayerJumping && isGrounded)
+        if (Input.IsKeyboardKeyPressed(KeyboardInput.Space) && !isPlayerJumping && isGrounded && canPlayerMove)
         {
             currentFloatFrame = 0;
             Audio.Stop(caveFootstep);
@@ -295,6 +295,10 @@ public class Player
                     velocity.Y = 0;
                     position.Y = tileBottomLeft.Y + 5;
                 }
+                if (tile.spriteIndex == 4)
+                {
+                    position.Y = 850;
+                }
             }
         }
 
@@ -308,6 +312,10 @@ public class Player
                     velocity.Y = 0;
                     isGrounded = true;
                     position.Y = tileTopLeft.Y - playerSize + 5;
+                }
+                if (tile.spriteIndex == 5)
+                {
+                    position.Y = 850;
                 }
             }
         }

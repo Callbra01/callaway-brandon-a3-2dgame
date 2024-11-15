@@ -10,7 +10,7 @@ namespace Game10003;
  */
 public class SceneHandler
 {
-    public int currentScene = 2;
+    public int currentScene = 4;
 
     // Splash screen variables
     static Texture2D avarusSplashTexture;
@@ -21,6 +21,9 @@ public class SceneHandler
     public static Texture2D caveTexture;
     public static Texture2D speedBoostTexture;
     public static Texture2D jumpBoostTexture;
+    public static Texture2D bottomSpikeTexture;
+    public static Texture2D topSpikeTexture;
+    public static Texture2D cameraTexture;
 
     // Start screen variables
     static Texture2D startScreenTexture;
@@ -30,16 +33,22 @@ public class SceneHandler
     int buttonTracker = 0;
     float timeTracker = 0;
     float backgroundXOffset = 0;
+    float backgroundYOffset = 0;
 
     LevelEditor Editor;
     LevelHandler levelHandler;
     Level levelOne;
     Level levelTwo;
     Level levelThree;
+    Level levelFour;
     Player player;
 
     Music levelMusic;
     Sound playerScream;
+    Sound confettiSound;
+    float levelMusicOffset = 0.8f;
+    bool hasEndMusicPlayed = false;
+    bool canLevelMusicPlay = true;
 
     public void Setup()
     {
@@ -49,16 +58,20 @@ public class SceneHandler
         Audio.SetVolume(splashSound, 0.5f);
 
         levelMusic = Audio.LoadMusic("../../../assets/audio/music/levelMusic.wav");
-        Audio.SetVolume(levelMusic, 0.8f);
+        Audio.SetVolume(levelMusic, levelMusicOffset);
 
         playerScream = Audio.LoadSound("../../../assets/audio/playerScream.wav");
         Audio.SetVolume(playerScream, 2.5f);
+
+        confettiSound = Audio.LoadSound("../../../assets/audio/confettiSound.wav");
+        Audio.SetVolume(confettiSound, 1f);
 
         Editor = new LevelEditor(8, 1);
         levelHandler = new LevelHandler();
         levelOne = new Level(8, 1, "LevelOne");
         levelTwo = new Level(8, 1, "LevelTwo");
         levelThree = new Level(8, 1, "LevelThree");
+        levelFour = new Level(8, 1, "LevelFour");
 
         player = new Player(new Vector2(400, 250));
 
@@ -66,6 +79,7 @@ public class SceneHandler
         levelOne.Setup();
         levelTwo.Setup();
         levelThree.Setup();
+        levelFour.Setup();
     }
 
     public void Update()
@@ -96,12 +110,22 @@ public class SceneHandler
             {
                 Audio.Play(playerScream);
             }
+
+            Text.Size = 25;
+            Text.Color = Color.White;
+            Text.Draw($"SCORE: {player.playerScore}", 300, 300);
         }
         // If current scene is above 4 (game has started), play music constantly
+        // Level one
         else if (currentScene >= 4)
         {
-            Graphics.Draw(backgroundTexture, backgroundXOffset, 0);
-            Audio.Play(levelMusic);
+            Draw.FillColor = Color.Green;
+            Draw.Rectangle(0, 0, 800, 600);
+            Graphics.Draw(backgroundTexture, backgroundXOffset, backgroundYOffset);
+            if (canLevelMusicPlay)
+            {
+                Audio.Play(levelMusic);
+            }
 
             if (currentScene == 4)
             {
@@ -114,10 +138,12 @@ public class SceneHandler
                     currentScene = 5;
                 }
             }
+            // Level two
             else if (currentScene == 5)
             {
                 player.playerHasExited = false;
                 LevelLogic(levelTwo);
+
                 if (player.playerHasExited)
                 {
                     ResetLevel();
@@ -125,10 +151,12 @@ public class SceneHandler
                     currentScene = 6;
                 }
             }
+            // Level three
             else if (currentScene == 6)
             {
                 player.playerHasExited = false;
                 LevelLogic(levelThree);
+
                 if (player.playerHasExited)
                 {
                     ResetLevel();
@@ -136,10 +164,18 @@ public class SceneHandler
                     currentScene = 7;
                 }
             }
+            // Level four
+            else if (currentScene == 7)
+            {
+                WinScreen();
+            }
 
-            Text.Size = 25;
-            Text.Color = Color.White;
-            Text.Draw($"SCORE: {player.playerScore}", 50, 550);
+            if (currentScene != 3 || currentScene != 7)
+            {
+                Text.Size = 25;
+                Text.Color = Color.White;
+                Text.Draw($"SCORE: {player.playerScore}", 50, 550);
+            }
         }
     }
 
@@ -149,10 +185,14 @@ public class SceneHandler
         player.position.X = 400;
         player.position.Y = 250;
 
-        for (int i = 0; i < levelOne.tileArray.Length; i++)
+        if (currentScene != 7)
         {
-            levelOne.tileArray[i].position.X = levelOne.tilePositions[i].X;
+            for (int i = 0; i < levelOne.tileArray.Length; i++)
+            {
+                levelOne.tileArray[i].position.X = levelOne.tilePositions[i].X;
+            }
         }
+
     }
 
     // Render level, handle player collision
@@ -174,6 +214,35 @@ public class SceneHandler
         }
     }
 
+    void WinScreen()
+    {
+        player.playerHasExited = false;
+        LevelLogic(levelFour);
+
+        player.canPlayerMove = false;
+
+        if (backgroundYOffset > -525)
+        {
+            backgroundYOffset -= 3;
+        }
+        else
+        {
+            Audio.Stop(levelMusic);
+            canLevelMusicPlay = false;
+            if (!Audio.IsPlaying(confettiSound) && !hasEndMusicPlayed)
+            {
+                Audio.Play(confettiSound);
+                hasEndMusicPlayed = true;
+            }
+            player.isPlayerDancing = true;
+        }
+
+        Text.Color = Color.Black;
+        Text.Size = 20;
+        Text.Draw($"WHY ARE YOU STILL PLAYING? WE HAVEN'T FINISHED THE LEVEL YET!!!\n\n\nSCORE: {player.playerScore}\n\n\n HOLD F TO PARTY", 55, 200);
+
+        Graphics.Draw(cameraTexture, 0, 0);
+    }
     void SplashScreen()
     {
         if (!Audio.IsPlaying(splashSound))
@@ -272,11 +341,14 @@ public class SceneHandler
     {
         backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture1.png");
         avarusSplashTexture = Graphics.LoadTexture("../../../assets/textures/avarusStudiosSplash.png");
+        cameraTexture = Graphics.LoadTexture("../../../assets/textures/cameraTexture.png");
 
         startScreenTexture = Graphics.LoadTexture("../../../assets/textures/startScreen.png");
         startButton = Graphics.LoadTexture("../../../assets/textures/startButton.png");
         levelEditorButton = Graphics.LoadTexture("../../../assets/textures/levelEditorButton.png");
         exitButton = Graphics.LoadTexture("../../../assets/textures/exitButton.png");
+        bottomSpikeTexture = Graphics.LoadTexture("../../../assets/textures/bottomSpikeTexture.png");
+        topSpikeTexture = Graphics.LoadTexture("../../../assets/textures/topSpikeTexture.png");
 
         caveTexture = Graphics.LoadTexture("../../../assets/textures/caveTexture.png");
         speedBoostTexture = Graphics.LoadTexture("../../../assets/textures/speedBoostTexture.png");
