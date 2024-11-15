@@ -10,69 +10,52 @@ namespace Game10003;
 public class Player
 {
     // Player variables
-    string playerName = "";
-    int playerClass;
-    int playerSize = 100;
-
-    // Motion variables
-    public Vector2 position = new Vector2(400, 250);
-    Vector2 velocity = new Vector2(0, 0);
     public int playerSpeed = 500;
-    int playerMaxSpeed = 1000;
-    int gravityForce = 18;
+    public Vector2 position = new Vector2(400, 250);
     bool isGrounded = false;
+    int playerMaxSpeed = 1000;
+    int playerSize = 100;
+    int gravityForce = 18;
     float friction = 50f;
     float collisionOffset = 5;
     float jumpForce = 6f;
+    Vector2 velocity = new Vector2(0, 0);
     Vector2 playerTop;
     Vector2 playerBottom;
     Vector2 playerLeft;
     Vector2 playerRight;
-    public bool playerHasExited = false;
 
     // Level variables
-    Vector2[] playerBounds = [new Vector2(0, 0), new Vector2(530, 0)];
+    public bool playerHasExited = false;
+    public int playerScore = 0;
     bool isPlayerInBounds = true;
+    Vector2[] playerBounds = [new Vector2(0, 0), new Vector2(530, 0)];
+    
 
     // Animation variables
+    bool isPlayerDancing = false;
+    bool isPlayerJumping = false;
+    int currentFrame = 0;
+    float animationSpeed = 11.85f;
+    float currentFloatFrame = 0;
     Texture2D[] idleFrames;
     Texture2D[] runRightFrames;
     Texture2D[] runLeftFrames;
     Texture2D[] danceFrames;
     Texture2D[] jumpFrames;
-    int currentFrame = 0;
-    float animationSpeed = 11.85f;
-    float currentFloatFrame = 0;
-    bool isPlayerDancing = false;
-    bool isPlayerJumping = false;
 
     // Audio variables
     Sound caveFootstep;
     Sound grindTrack;
     Sound speedBoostSound;
     Sound jumpBoostSound;
-  
-
 
     public Player(Vector2 newPosition)
     {
 
-        position = newPosition; 
+        position = newPosition;
 
-        // Initialize audio variables
-        caveFootstep = Audio.LoadSound("../../../assets/audio/caveFootstep.wav");
-        Audio.SetVolume(caveFootstep, 0.3f);
-
-        grindTrack = Audio.LoadSound("../../../assets/audio/music/grindTrack.wav");
-        Audio.SetVolume(grindTrack, 0.5f);
-
-        jumpBoostSound = Audio.LoadSound("../../../assets/audio/JumpUpCollected.wav");
-        Audio.SetVolume(jumpBoostSound, 0.5f);
-
-        speedBoostSound = Audio.LoadSound("../../../assets/audio/powerUpCollected.wav");
-        Audio.SetVolume(speedBoostSound, 0.5f);
-
-
+        InitializeAudio();
 
         // Initialize animation frame arrays
         idleFrames = new Texture2D[5];
@@ -90,6 +73,22 @@ public class Player
             danceFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/dance/danceFrame{frame + 1}.png");
             jumpFrames[frame] = Graphics.LoadTexture($"../../../assets/textures/playerSprites/jump/jumpFrame{frame + 1}.png");
         }
+    }
+
+    void InitializeAudio()
+    {
+        // Initialize audio variables
+        caveFootstep = Audio.LoadSound("../../../assets/audio/caveFootstep.wav");
+        Audio.SetVolume(caveFootstep, 0.3f);
+
+        grindTrack = Audio.LoadSound("../../../assets/audio/music/grindTrack.wav");
+        Audio.SetVolume(grindTrack, 0.5f);
+
+        jumpBoostSound = Audio.LoadSound("../../../assets/audio/JumpUpCollected.wav");
+        Audio.SetVolume(jumpBoostSound, 0.5f);
+
+        speedBoostSound = Audio.LoadSound("../../../assets/audio/powerUpCollected.wav");
+        Audio.SetVolume(speedBoostSound, 0.5f);
     }
 
     public void Handle(Tile[] tileArray, int sceneCount)
@@ -120,6 +119,7 @@ public class Player
                 position.X = LeftBoundTopRight.X;
             }
         }
+        // Move level on X position when player hits right boundary
         else if (playerRight.X > RightBoundTopleft.X && playerRight.X < RightBoundTopRight.X)
         {
             if (playerRight.Y < RightBoundBottomleft.Y && playerRight.Y > RightBoundTopleft.Y)
@@ -180,9 +180,9 @@ public class Player
         // If player can jump, allow jump. If player is already jumping, dont allow another jump
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Space) && !isPlayerJumping && isGrounded)
         {
-            velocity.Y -= velocity.Y + (jumpForce * 100);
             currentFloatFrame = 0;
             Audio.Stop(caveFootstep);
+            velocity.Y -= velocity.Y + (jumpForce * 100);
             isPlayerJumping = true;
             isGrounded = false;
         }
@@ -195,7 +195,6 @@ public class Player
         if (velocity.X > 0)
         {
             velocity.X -= friction;
-
         }
         else if (velocity.X < 0)
         {
@@ -205,11 +204,13 @@ public class Player
 
     public void HandleCollision(Tile tile)
     {
+        // Get mid point of player edges
         playerTop = new Vector2(position.X + (playerSize / 2), position.Y - collisionOffset);
         playerBottom = new Vector2(position.X + (playerSize / 2), position.Y + playerSize - collisionOffset);
         playerLeft = new Vector2(position.X, position.Y + (playerSize / 2) - collisionOffset);
         playerRight = new Vector2(position.X + playerSize, position.Y + (playerSize / 2) - collisionOffset);
 
+        // Get corners of given tile
         Vector2 tileTopLeft = new Vector2(tile.position.X - (collisionOffset / 2), tile.position.Y - (collisionOffset / 2));
         Vector2 tileTopRight = new Vector2(tile.position.X + tile.size + (collisionOffset / 2), tile.position.Y - (collisionOffset / 2));
         Vector2 tileBottomLeft = new Vector2(tile.position.X - (collisionOffset / 2), tile.position.Y + tile.size + (collisionOffset / 2));
@@ -229,28 +230,28 @@ public class Player
                 // Jump powerup
                 else if (tile.spriteIndex == 2 && tile.isPowerUpActive)
                 {
+                    jumpForce += 1f;
                     if (!Audio.IsPlaying(speedBoostSound))
                     {
                         Audio.Play(speedBoostSound);
                     }
-                    jumpForce += 1f;
                     tile.isPowerUpActive = false;
                 }
                 // Speed powerup
                 else if (tile.spriteIndex == 3 && tile.isPowerUpActive)
                 {
+                    playerSpeed += 50;
                     if (!Audio.IsPlaying(speedBoostSound))
                     {
                         Audio.Play(speedBoostSound);
                     }
-                    playerSpeed += 50;
                     tile.isPowerUpActive = false;
                 }
+                // Level Exit
                 else if (tile.spriteIndex == 1)
                 {
                     playerHasExited = true;
                 }
-                
             }
         }
         else if (playerRight.X > tileTopLeft.X && playerRight.X < tileTopRight.X)
@@ -296,6 +297,7 @@ public class Player
                 }
             }
         }
+
         // Handle player floor collision
         else if (playerBottom.Y > tileTopLeft.Y && playerBottom.Y < tileBottomLeft.Y)
         {
@@ -342,9 +344,10 @@ public class Player
             currentFloatFrame = 0;
         }
     }
-    // Render and Handle all animation frames
+
     void Render()
     {
+        // Update frame counter every second * animation speed scalar
         UpdateFrames();
 
         // If the player is moving, display run animation. Otherwise, display idle animation
@@ -361,7 +364,7 @@ public class Player
             Graphics.Draw(runLeftFrames[currentFrame], position);
         }
 
-
+        
         if (isPlayerJumping && !isPlayerDancing)
         {
             Graphics.Draw(jumpFrames[currentFrame], position);

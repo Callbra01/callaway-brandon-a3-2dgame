@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Game10003;
 
@@ -11,7 +10,7 @@ namespace Game10003;
  */
 public class SceneHandler
 {
-    public int currentScene = 4;
+    public int currentScene = 2;
 
     // Splash screen variables
     static Texture2D avarusSplashTexture;
@@ -36,6 +35,7 @@ public class SceneHandler
     LevelHandler levelHandler;
     Level levelOne;
     Level levelTwo;
+    Level levelThree;
     Player player;
 
     Music levelMusic;
@@ -58,12 +58,14 @@ public class SceneHandler
         levelHandler = new LevelHandler();
         levelOne = new Level(8, 1, "LevelOne");
         levelTwo = new Level(8, 1, "LevelTwo");
+        levelThree = new Level(8, 1, "LevelThree");
 
         player = new Player(new Vector2(400, 250));
 
         Editor.Setup();
         levelOne.Setup();
         levelTwo.Setup();
+        levelThree.Setup();
     }
 
     public void Update()
@@ -88,19 +90,17 @@ public class SceneHandler
         }
         else if (currentScene == 3)
         {
+            // Upon player death, play player scream
             Audio.SetVolume(levelMusic, 0.2f);
             if (!Audio.IsPlaying(playerScream))
             {
                 Audio.Play(playerScream);
             }
         }
+        // If current scene is above 4 (game has started), play music constantly
         else if (currentScene >= 4)
         {
             Graphics.Draw(backgroundTexture, backgroundXOffset, 0);
-            
-
-            //Draw.FillColor = Color.White;
-            //Draw.Rectangle(0, 0, 800, 800);
             Audio.Play(levelMusic);
 
             if (currentScene == 4)
@@ -110,6 +110,7 @@ public class SceneHandler
                 if (player.playerHasExited)
                 {
                     ResetLevel();
+                    player.playerScore += 100;
                     currentScene = 5;
                 }
             }
@@ -120,13 +121,25 @@ public class SceneHandler
                 if (player.playerHasExited)
                 {
                     ResetLevel();
+                    player.playerScore += 100;
                     currentScene = 6;
                 }
             }
             else if (currentScene == 6)
             {
-
+                player.playerHasExited = false;
+                LevelLogic(levelThree);
+                if (player.playerHasExited)
+                {
+                    ResetLevel();
+                    player.playerScore += 100;
+                    currentScene = 7;
+                }
             }
+
+            Text.Size = 25;
+            Text.Color = Color.White;
+            Text.Draw($"SCORE: {player.playerScore}", 50, 550);
         }
     }
 
@@ -259,7 +272,6 @@ public class SceneHandler
     {
         backgroundTexture = Graphics.LoadTexture("../../../assets/textures/backgroundTexture1.png");
         avarusSplashTexture = Graphics.LoadTexture("../../../assets/textures/avarusStudiosSplash.png");
-
 
         startScreenTexture = Graphics.LoadTexture("../../../assets/textures/startScreen.png");
         startButton = Graphics.LoadTexture("../../../assets/textures/startButton.png");

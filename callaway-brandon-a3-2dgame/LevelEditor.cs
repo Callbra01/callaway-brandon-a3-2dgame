@@ -98,13 +98,13 @@ public class LevelEditor
         // Save Current Level with Q and Load Level with E
         if (Input.IsKeyboardKeyPressed(KeyboardInput.Q))
         {
-            levelHandler.SaveLevel("../../../assets/levels/levelTwo.txt", tileArray);
+            levelHandler.SaveLevel("../../../assets/levels/levelThree.txt", tileArray);
         }
         else if (Input.IsKeyboardKeyPressed(KeyboardInput.E))
         {
             tileColorIndexVals = new int[tileArray.Length];
 
-            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelTwo.txt", tileColorIndexVals);
+            tileColorIndexVals = levelHandler.LoadLevel("../../../assets/levels/levelThree.txt", tileColorIndexVals);
 
             for (int i = 0; i < tileArray.Length; i++)
             {
@@ -127,23 +127,6 @@ public class LevelEditor
                 tileArray[tile].position.X += 1000 * Time.DeltaTime;
             }
         }
-
-        /*
-        if (Input.IsKeyboardKeyDown(KeyboardInput.S))
-        {
-            for (int tile = 0; tile < tileArray.Length; tile++)
-            {
-                tileArray[tile].position.Y -= 1000 * Time.DeltaTime;
-            }
-        }
-        else if (Input.IsKeyboardKeyDown(KeyboardInput.W))
-        {
-            for (int tile = 0; tile < tileArray.Length; tile++)
-            {
-                tileArray[tile].position.Y += 1000 * Time.DeltaTime;
-            }
-        }
-        */
     }
 
     void MouseCollisionCheck()
