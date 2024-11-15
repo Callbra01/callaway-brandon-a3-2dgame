@@ -10,7 +10,7 @@ namespace Game10003;
  */
 public class SceneHandler
 {
-    public int currentScene = 4;
+    public int currentScene = 0;
 
     // Splash screen variables
     static Texture2D avarusSplashTexture;
